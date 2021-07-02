@@ -7,8 +7,6 @@ import logging
 import flask.json
 from markupsafe import escape
 
-logging.basicConfig(filename='/tmp/bootstrap.log', level=logging.DEBUG)
-
 # This makes sure flask can marshall Millisatoshi values.
 class MsatJSONEncoder(flask.json.JSONEncoder):
     def default(self, o):
@@ -100,6 +98,8 @@ def flask_process(port, app):
 
 @plugin.init()
 def init(options, configuration, plugin):
+    logging.basicConfig(filename=options['bootstrap-log-file'], level=logging.DEBUG)
+
     port = int(options['bootstrap-api-port'])
     p = multiprocessing.Process(target=flask_process,
                                 args=[port, app],
@@ -109,7 +109,13 @@ def init(options, configuration, plugin):
 
 plugin.add_option(
     'bootstrap-api-port',
-    '80',
+    '5000',
     'Which port should the bootstrap server listen to?'
 )
+plugin.add_option(
+    'bootstrap-log-file',
+    '/tmp/bootstrap.log',
+    'Where should logs go?'
+)
+
 plugin.run()
