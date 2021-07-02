@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # LICENSE: MIT / APACHE
 from pyln.client import Plugin, RpcError, LightningRpc
-from flask import Flask
+import flask
 import multiprocessing
 import logging
-import flask.json
 from markupsafe import escape
 
 # This makes sure flask can marshall Millisatoshi values.
@@ -17,8 +16,8 @@ class MsatJSONEncoder(flask.json.JSONEncoder):
         return __super__.default(self, o)
 
 
-Flask.json_encoder = MsatJSONEncoder
-app = Flask('bootstrap')
+flask.Flask.json_encoder = MsatJSONEncoder
+app = flask.Flask('bootstrap')
 plugin = Plugin()
 
 
@@ -90,9 +89,17 @@ def status():
     return plugin.rpc.getinfo()
 
 
+@app.route('/')
+def default_page():
+    return flask.render_template('index.html',
+                                 API=flask.request.base_url, NETWORK=network)
+
+
 # This is stolen entirely from Rene Pickhardt's donations plugin:
 # https://github.com/lightningd/plugins/tree/master/donations
-def flask_process(port, app):
+def flask_process(port, app, net):
+    global network
+    network = net
     app.run(host="0.0.0.0", port=port)
 
 
@@ -100,9 +107,10 @@ def flask_process(port, app):
 def init(options, configuration, plugin):
     logging.basicConfig(filename=options['bootstrap-log-file'], level=logging.DEBUG)
 
+    network = plugin.rpc.getinfo()['network']
     port = int(options['bootstrap-api-port'])
     p = multiprocessing.Process(target=flask_process,
-                                args=[port, app],
+                                args=[port, app, network],
                                 name="server on port {}".format(port))
     p.start()
 
