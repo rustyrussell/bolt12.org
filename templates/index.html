@@ -48,7 +48,7 @@
     <p>
       You can see a complete JSON return description <a href="https://github.com/ElementsProject/lightning/blob/master/doc/lightning-fetchinvoice.7.md">on the manual page</a>.
     </p>
-    <h2 id="fetchinvoicerecurring"> {{ API }}fetchinvoicerecurring/OFFER/LABEL/COUNTER[/START] (GET) </h2>
+    <h2 id="fetchinvoicerecurring"> {{ API }}fetchinvoicerecurring/OFFER/PAYERKEY/COUNTER[/START] (GET) </h2>
     <p>
       This fetches an invoice corresponding to an offer which
       has <i>recurrence</i>, and as a courtesy, decodes it.  Returns
@@ -56,12 +56,13 @@
       for testing.
     </p>
     <p>
-      The LABEL is a unique string to identify this series of
-      recurrences.  COUNTER is the invoice number (it starts at 0, and
-      increases by 1 every time).  The offering node won't give you an
-      invoice until the previous one has been paid (and also won't
-      unless you're inside the paywindow, if the offer specifies one).
-      START is required if the offer specifies <tt>start_any_period</tt>,
+      The PAYERKEY is a 32-byte hex secret key (needed to sign the
+      invoice request), also uniquely identifies this series of recurrences.
+      COUNTER is the invoice number (it starts at 0, and increases by
+      1 every time).  The offering node won't give you an invoice
+      until the previous one has been paid (and also won't unless
+      you're inside the paywindow, if the offer specifies one).  START
+      is required if the offer specifies <tt>start_any_period</tt>,
       otherwise it is not allowed.
     </p>
     <p>

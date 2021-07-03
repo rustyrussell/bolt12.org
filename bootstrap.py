@@ -62,21 +62,21 @@ def fetchinvoice(omq):
     return inv
 
 
-@app.route('/fetchinvoicerecurring/<offer>/<label>/<path:counterstart>',
+@app.route('/fetchinvoicerecurring/<offer>/<payerkey>/<path:counterstart>',
            methods=['GET'])
-def fetchinvoice_recurring(offer, label, counterstart):
+def fetchinvoice_recurring(offer, payerkey, counterstart):
     argdict = {'offer': offer,
-               'recurrence_label': label}
+               'payer_secret': payerkey}
     args = escape(counterstart).split('/')
 
     argdict['recurrence_counter'] = take_first_or_none(args)
     if argdict['offer'] is None:
         return ('Bad request: needs counter arg: '
-                ' /offer/label/counter/[start]/', 400)
+                ' /offer/payerkey/counter/[start]/', 400)
     argdict['recurrence_start'] = take_first_or_none(args)
     if len(args) != 0:
         return ('Bad request: only takes 3 or 4 params:'
-                ' /offer/label/counter/[start]/', 400)
+                ' /offer/payerkey/counter/[start]/', 400)
 
     inv = plugin.rpc.call('fetchinvoice', argdict)
     # Save them the round trip
