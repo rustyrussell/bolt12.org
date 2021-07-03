@@ -95,6 +95,12 @@ def default_page():
                                  API=flask.request.base_url, NETWORK=network)
 
 
+@app.route('/examples')
+def example_page():
+    return flask.render_template('{}-examples.html'.format(network),
+                                 API=flask.request.base_url, NETWORK=network)
+
+
 # This is stolen entirely from Rene Pickhardt's donations plugin:
 # https://github.com/lightningd/plugins/tree/master/donations
 def flask_process(port, app, net):
