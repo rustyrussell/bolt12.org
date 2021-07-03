@@ -16,16 +16,14 @@ class MsatJSONEncoder(flask.json.JSONEncoder):
         return __super__.default(self, o)
 
 
+plugin = Plugin()
 flask.Flask.json_encoder = MsatJSONEncoder
 app = flask.Flask('bootstrap')
-plugin = Plugin()
 
 
 @app.errorhandler(RpcError)
 def handle_rpcerror(e):
-    return ('Bad request: {} returned code {}: {}'.format(e.method,
-                                                          e.error['code'],
-                                                          e.error['message']),
+    return ('Bad request: {} returned {}'.format(e.method, e.error),
             400)
 
 
