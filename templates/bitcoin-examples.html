@@ -5,12 +5,18 @@
       Here are several simple examples you can use for testing.
     </p>
     <h2>Simple non-recurring examples</h2>
+
+    <h3>The simplest possible offer: no amount specified.</h3>
+    Created by command: <tt>lightning-cli offer any "Offer by rusty's node"</tt>
     <dl>
-      <dt>The simplest possible offer: no amount specified.<br>
-	<tt>$ lightning-cli offer any "Offer by rusty's node"</tt></dt>
-      <dd> offer_id: b261393c4d77dac1f6e70d79731fbe42e82b84702d2df2da9dd1d465da7d2090<br>
-	bolt12: lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsq4uu3wwxw3jk429gus78njdx8zrs3pxq4lh9du95qz5l2chmxh4pdmuv3mh54q4f7xyszhthmr4g5zrsfuskp8ndgp496f4drlnsrgz (<a href="{{API}}/decode/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsq4uu3wwxw3jk429gus78njdx8zrs3pxq4lh9du95qz5l2chmxh4pdmuv3mh54q4f7xyszhthmr4g5zrsfuskp8ndgp496f4drlnsrgz">decode</a>)<br>
-	bolt12_unsigned: lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs (<a href="{{API}}/decode/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs">decode</a>)<br>
+      <dt> offer_id </dt>
+      <dd> b261393c4d77dac1f6e70d79731fbe42e82b84702d2df2da9dd1d465da7d2090</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsq4uu3wwxw3jk429gus78njdx8zrs3pxq4lh9du95qz5l2chmxh4pdmuv3mh54q4f7xyszhthmr4g5zrsfuskp8ndgp496f4drlnsrgz (<a href="/decode/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsq4uu3wwxw3jk429gus78njdx8zrs3pxq4lh9du95qz5l2chmxh4pdmuv3mh54q4f7xyszhthmr4g5zrsfuskp8ndgp496f4drlnsrgz">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs (<a href="/decode/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
 	<pre>
 █████████████████████████████████████████████
 █████████████████████████████████████████████
@@ -37,12 +43,25 @@
 █████████████████████████████████████████████
 	</pre>
       </dd>
-      <dt>An offer with a fixed amount (technically a minimum: you can tip), with a quantity so you can order more than one.  It also has a vendor field.<br>
-	<tt>$ lightning-cli offer amount=50 description="50msat multi-quantity offer" vendor="rustcorp.com.au" quantity_min=1</tt></dt>
+    </dl>
+
+    <p>
+      Here's the how you'd fetch an invoice from it (in this case, for 100 msat):<br>
+      <a href="/fetchinvoice/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsq4uu3wwxw3jk429gus78njdx8zrs3pxq4lh9du95qz5l2chmxh4pdmuv3mh54q4f7xyszhthmr4g5zrsfuskp8ndgp496f4drlnsrgz/100">/fetchinvoice/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsq4uu3wwxw3jk429gus78njdx8zrs3pxq4lh9du95qz5l2chmxh4pdmuv3mh54q4f7xyszhthmr4g5zrsfuskp8ndgp496f4drlnsrgz/100</a>
+    </p>
+
+    <h3>An offer with a fixed amount (technically a minimum: you can tip), with a quantity so you can order more than one.  It also has a vendor field.</h3>
+    Created by command: <tt>lightning-cli offer amount=50 description="50msat multi-quantity offer" vendor="rustcorp.com.au" quantity_min=1</tt>
+    <dl>
+      <dt>
+	offer_id </dt>
+      <dd> 29fedd7a472e0c8e469bf2501fc2e513462a8ba17d023d3e35795b8f83e1273a</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcypc334veu09djr47j2lvws4pwf0q6t3nh6pedy4lj78sn5ch6lqdmzyy5kypfkzu0st7dmm5gxcp6t33vg0c4kxn2qveh7ayn3nu3dpfs (<a href="/decode/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcypc334veu09djr47j2lvws4pwf0q6t3nh6pedy4lj78sn5ch6lqdmzyy5kypfkzu0st7dmm5gxcp6t33vg0c4kxn2qveh7ayn3nu3dpfs">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5 (<a href="/decode/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5">decode</a>)</dd>
+      <dt>QR code:</dt>
       <dd>
-	offer_id: 29fedd7a472e0c8e469bf2501fc2e513462a8ba17d023d3e35795b8f83e1273a<br>
-	bolt12: lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcypc334veu09djr47j2lvws4pwf0q6t3nh6pedy4lj78sn5ch6lqdmzyy5kypfkzu0st7dmm5gxcp6t33vg0c4kxn2qveh7ayn3nu3dpfs (<a href="{{API}}/decode/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcypc334veu09djr47j2lvws4pwf0q6t3nh6pedy4lj78sn5ch6lqdmzyy5kypfkzu0st7dmm5gxcp6t33vg0c4kxn2qveh7ayn3nu3dpfs">decode</a>)<br>
-	bolt12_unsigned: lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5 (<a href="{{API}}/decode/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5">decode</a>)<br>
 	<pre>
 █████████████████████████████████████████████████████
 █████████████████████████████████████████████████████
@@ -74,14 +93,25 @@
 	</pre>
       </dd>
     </dl>
+
+    <p>
+      Here's the how you'd fetch an invoice from it (default amount):<br>
+      <a href="/fetchinvoice/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5">/fetchinvoice/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5</a>
+    </p>
+
     <h2>Recurring examples</h2>
+    <h3>Simple offer asks for 100msat every minute:</h3>
+    Created by command: <tt>lightning-cli offer amount=100msat description="100msat every minute" vendor="rusty.ozlabs.org" recurrence=1minute</tt>
     <dl>
-      <dt>Simple offer asks for 100msat every minute:<br>
-	<tt>$ lightning-cli offer amount=100msat description="100msat every minute" vendor="rusty.ozlabs.org" recurrence=1minute</tt></dt>
+      <dt>
+	offer_id </dt>
+      <dd> 8736cb12097eb41881c6bb065188dc501243cc8d46fe53c0aa5f3beba531e89f</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcyp2m7mtkcfmcqnk9rpslnxppgrs6lw20p9k34c3d595hf5rgg5jpwzgmpk6gyu04emyk5tq3mfe5rn3f7upgqnwfygydxezk9seqlf0vs (<a href="/decode/lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcyp2m7mtkcfmcqnk9rpslnxppgrs6lw20p9k34c3d595hf5rgg5jpwzgmpk6gyu04emyk5tq3mfe5rn3f7upgqnwfygydxezk9seqlf0vs">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5 (<a href="/decode/lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5">decode</a>)</dd>
+      <dt>QR code:</dt>
       <dd>
-	offer_id: 8736cb12097eb41881c6bb065188dc501243cc8d46fe53c0aa5f3beba531e89f<br>
-	bolt12: lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcyp2m7mtkcfmcqnk9rpslnxppgrs6lw20p9k34c3d595hf5rgg5jpwzgmpk6gyu04emyk5tq3mfe5rn3f7upgqnwfygydxezk9seqlf0vs (<a href="{{API}}/decode/lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykqhcyp2m7mtkcfmcqnk9rpslnxppgrs6lw20p9k34c3d595hf5rgg5jpwzgmpk6gyu04emyk5tq3mfe5rn3f7upgqnwfygydxezk9seqlf0vs">decode</a>)<br>
-	bolt12_unsigned: lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5 (<a href="{{API}}/decode/lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5">decode</a>)<br>
 	<pre>
 █████████████████████████████████████████████████
 █████████████████████████████████████████████████
@@ -110,12 +140,30 @@
 █████████████████████████████████████████████████
 	</pre>
       </dd>
-      <dt>Offer asks for 100msat every minute, but only three times:<br>
-	<tt>$ lightning-cli offer amount=100msat description="100msat every minute, up to three times" vendor="rusty.ozlabs.org" recurrence=1minute recurrence_limit=2</tt></dt>
+    </dl>
+
+    <p>
+      Here's the how you'd fetch the first invoice, using your super-secret payerkey of 010101...01:<br>
+      <a href="/fetchinvoicerecurring/lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5/0101010101010101010101010101010101010101010101010101010101010101/0"></a>
+    </p>
+
+    <p>
+      Note that you cannot fetch the next invoice until that one is paid! (Hurry up, you only have a minute!).  Once you did, you could fetch again::<br>
+      <a href="/fetchinvoicerecurring/lno1pqqkgzs5xycrqmtnv96zqetkv4e8jgrdd9h82ar9zsg8yatnw3ujumm6d3skyuewdaexwxszqq7pugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5/0101010101010101010101010101010101010101010101010101010101010101/1"></a>
+    </p>
+      
+    <h3>Offer asks for 100msat every minute, but only three times:</h3>
+    Created by command: <tt>lightning-cli offer amount=100msat description="100msat every minute, up to three times" vendor="rusty.ozlabs.org" recurrence=1minute recurrence_limit=2</tt>
+    <dl>
+      <dt>
+	offer_id </dt>
+      <dd> cd49fb550ef63acaa04ebe94f92b7d70095cc42a6fd55671dbffe9d56d9cfdf4</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqs9uzqwaawa85nkmc9xzrvk6mxkwac4ss99k7skly4fa3rc7dywgddzwmz9wkfjvwdfd78xxha6y0lxjuju533h3rnnng26vpul8crv7rpnag (<a href="/decode/lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqs9uzqwaawa85nkmc9xzrvk6mxkwac4ss99k7skly4fa3rc7dywgddzwmz9wkfjvwdfd78xxha6y0lxjuju533h3rnnng26vpul8crv7rpnag">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqsy (<a href="/decode/lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqsy">decode</a>)</dd>
+      <dt>QR code:</dt>
       <dd>
-	offer_id: cd49fb550ef63acaa04ebe94f92b7d70095cc42a6fd55671dbffe9d56d9cfdf4<br>
-	bolt12: lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqs9uzqwaawa85nkmc9xzrvk6mxkwac4ss99k7skly4fa3rc7dywgddzwmz9wkfjvwdfd78xxha6y0lxjuju533h3rnnng26vpul8crv7rpnag (<a href="{{API}}/decode/lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqs9uzqwaawa85nkmc9xzrvk6mxkwac4ss99k7skly4fa3rc7dywgddzwmz9wkfjvwdfd78xxha6y0lxjuju533h3rnnng26vpul8crv7rpnag">decode</a>)<br>
-	bolt12_unsigned: lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqsy (<a href="{{API}}/decode/lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqsy">decode</a>)<br>
 	<pre>
 █████████████████████████████████████████████████████████
 █████████████████████████████████████████████████████████
@@ -148,12 +196,20 @@
 █████████████████████████████████████████████████████████
 	</pre>
       </dd>
-      <dt>Offer asks for 100msat every day, first period being 1 Jan 2021 (you can start at any period though):<br>
-	<tt>$ lightning-cli offer amount=100msat description="100msat every day, from 1-Jan-2021" vendor="rusty.ozlabs.org" recurrence=1day recurrence_base=$(date +%s -d 2021-01-01)</tt></dt>
+    </dl>
+
+    <h3>Offer asks for 100msat every day, first period being 1 Jan 2021 (you can start at any period though):</h3>
+    Created by command: <tt>lightning-cli offer amount=100msat description="100msat every day, from 1-Jan-2021" vendor="rusty.ozlabs.org" recurrence=1day recurrence_base=$(date +%s -d 2021-01-01)</tt>
+    <dl>
+      <dt>
+	offer_id </dt>
+      <dd> 53656deab36d28e944cce9bdf5240cacedb7a13d06bf08a02f08ea0c3b09aab4</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqs8u9w947pnwkk46lwduen7yspk8msau7md2ds99nd5d3rsa59jhearj8vss5gpgahhhhkf8dpcc9v2dyt66k50a6tmsv895876v8xg3u (<a href="/decode/lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqs8u9w947pnwkk46lwduen7yspk8msau7md2ds99nd5d3rsa59jhearj8vss5gpgahhhhkf8dpcc9v2dyt66k50a6tmsv895876v8xg3u">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs (<a href="/decode/lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs">decode</a>)</dd>
+      <dt>QR code:</dt>
       <dd>
-	offer_id: 53656deab36d28e944cce9bdf5240cacedb7a13d06bf08a02f08ea0c3b09aab4<br>
-	bolt12: lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqs8u9w947pnwkk46lwduen7yspk8msau7md2ds99nd5d3rsa59jhearj8vss5gpgahhhhkf8dpcc9v2dyt66k50a6tmsv895876v8xg3u (<a href="{{API}}/decode/lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqs8u9w947pnwkk46lwduen7yspk8msau7md2ds99nd5d3rsa59jhearj8vss5gpgahhhhkf8dpcc9v2dyt66k50a6tmsv895876v8xg3u">decode</a>)<br>
-	bolt12_unsigned: lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs (<a href="{{API}}/decode/lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs">decode</a>)<br>
 	<pre>
 ████████████████████████████████████████████████████████
 █████████████████████████████████████████████████████████
@@ -186,12 +242,26 @@
 █████████████████████████████████████████████████████████
 	</pre>
       </dd>
-      <dt>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you can pay 1 hour early, or up to 60 seconds into the period<br>
-	<tt>$ lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pay 1hr before to 60 seconds late" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-3600+60</tt></dt>
+    </dl>
+
+    <p>
+      You need to calculate the current period, which depends on the current time (UTC).   I ran <tt>echo $(( ( $(date +%s) - $(date +%s -d 2021-01-01) ) / 3600 / 24 ))</tt> and it told me it was day 183 (it's 2021-07-03), so I can request invoices for 183 or 184 (default paywindow is that you can pay the current or nex period):
+      Here's the how I fetched the first invoice, using that super-secret payerkey of 010101...01:<br>
+      <a href="/fetchinvoicerecurring/lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs/0101010101010101010101010101010101010101010101010101010101010101/0/183"></a>
+    </p>
+
+    <h3>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you can pay 1 hour early, or up to 60 seconds into the period</h3>
+    Created by command: <tt>lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pay 1hr before to 60 seconds late" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-3600+60</tt>
+    <dl>
+      <dt>
+	offer_id </dt>
+      <dd> faaab7138190771f78c80bba8cd31d1ce8bf08300ea62c9f8884093eaf099f0c</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8ncyps9hnhnnllqtpq6mnla2kdk7wzgy6xyrwswgn2rpaw9l3nq6a46e7eff4ragkun352dum8h029fpr00dt27wkndpv0fkxtxccqp4hevq (<a href="/decode/lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8ncyps9hnhnnllqtpq6mnla2kdk7wzgy6xyrwswgn2rpaw9l3nq6a46e7eff4ragkun352dum8h029fpr00dt27wkndpv0fkxtxccqp4hevq">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8s (<a href="/decode/lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8s">decode</a>)</dd>
+      <dt>QR code:</dt>
       <dd>
-	offer_id: faaab7138190771f78c80bba8cd31d1ce8bf08300ea62c9f8884093eaf099f0c<br>
-	bolt12: lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8ncyps9hnhnnllqtpq6mnla2kdk7wzgy6xyrwswgn2rpaw9l3nq6a46e7eff4ragkun352dum8h029fpr00dt27wkndpv0fkxtxccqp4hevq (<a href="{{API}}/decode/lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8ncyps9hnhnnllqtpq6mnla2kdk7wzgy6xyrwswgn2rpaw9l3nq6a46e7eff4ragkun352dum8h029fpr00dt27wkndpv0fkxtxccqp4hevq">decode</a>)<br>
-	bolt12_unsigned: lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8s (<a href="{{API}}/decode/lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8s">decode</a>)<br>
 	<pre>
 █████████████████████████████████████████████████████████████████
 █████████████████████████████████████████████████████████████████
@@ -228,12 +298,19 @@
 █████████████████████████████████████████████████████████████████
 	</pre>
       </dd>
-      <dt>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you pay a percentage of the 10 days remaining (you can pay up to 10 days before)<br>
-	<tt>$ lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pro-rata" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-864000+864000%</tt></dt>
+    </dl>
+    <h3>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you pay a percentage of the 10 days remaining (you can pay up to 10 days before)</h3>
+    Created by command: <tt>lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pro-rata" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-864000+864000%</tt>
+    <dl>
+      <dt>
+	offer_id </dt>
+      <dd> 145a1ac48c89bf9f6dbe6b45011b66022e91e4bfcf42f500960de46dc867edbd</dd>
+      <dt>bolt12</dt>
+      <dd>lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hspuzq8ltcc2ne0me4cvvvgdpc6fvkl4hdpzg0u6m80mnvfsqqm6szg0xuadzx0lcduzs73769u97w7hwkdlwra592zhh92j8gfv4zgjs0j5c (<a href="/decode/lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hspuzq8ltcc2ne0me4cvvvgdpc6fvkl4hdpzg0u6m80mnvfsqqm6szg0xuadzx0lcduzs73769u97w7hwkdlwra592zhh92j8gfv4zgjs0j5c">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hsq (<a href="/decode/lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hsq">decode</a>)</dd>
+      <dt>QR code:</dt>
       <dd>
-	offer_id: 145a1ac48c89bf9f6dbe6b45011b66022e91e4bfcf42f500960de46dc867edbd<br>
-	bolt12: lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hspuzq8ltcc2ne0me4cvvvgdpc6fvkl4hdpzg0u6m80mnvfsqqm6szg0xuadzx0lcduzs73769u97w7hwkdlwra592zhh92j8gfv4zgjs0j5c (<a href="{{API}}/decode/lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hspuzq8ltcc2ne0me4cvvvgdpc6fvkl4hdpzg0u6m80mnvfsqqm6szg0xuadzx0lcduzs73769u97w7hwkdlwra592zhh92j8gfv4zgjs0j5c">decode</a>)<br>
-	bolt12_unsigned: lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hsq (<a href="{{API}}/decode/lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hsq">decode</a>)<br>
 	<pre>
 █████████████████████████████████████████████████████████████
 █████████████████████████████████████████████████████████████
@@ -266,6 +343,50 @@
 ████▄▄▄▄▄▄▄█▄███▄██▄▄▄▄▄▄██▄▄▄▄███▄███▄▄▄▄█▄█▄▄▄▄█▄▄▄▄▄██████
 █████████████████████████████████████████████████████████████
 █████████████████████████████████████████████████████████████
+	</pre>
+      </dd>
+    </dl>
+
+    <h3>Offer asks for up to $10 USD every day</h3>
+    Created by command: <tt>lightning-cli offer amount=10USD description="10USD every day" vendor="rusty.ozlabs.org" recurrence=1day</tt>
+    <dl>
+      <dt>
+	offer_id </dt>
+      <dd> 017e223e1d9f8095624d7953fcf9f6011639392556d26de8357201fff0d7f25d</dd>
+      <dt>bolt12</dt>
+      <dd>lno1qcp4256ypqpq86q2pucnq42ngssx2an9wfujqerp0y2pqun4wd68jtn00fkxzcnn9ehhyec6qgqsz83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsxz9303walmkn52nvlvxdyt23xk3t5j9t4czwugwj7de4t6p7vjhvap98kjyxd0wxds09va9a68kak6qt3x3wp0nc36xzawaetvk7cvw (<a href="/decode/lno1qcp4256ypqpq86q2pucnq42ngssx2an9wfujqerp0y2pqun4wd68jtn00fkxzcnn9ehhyec6qgqsz83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsxz9303walmkn52nvlvxdyt23xk3t5j9t4czwugwj7de4t6p7vjhvap98kjyxd0wxds09va9a68kak6qt3x3wp0nc36xzawaetvk7cvw">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd>lno1qcp4256ypqpq86q2pucnq42ngssx2an9wfujqerp0y2pqun4wd68jtn00fkxzcnn9ehhyec6qgqsz83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs (<a href="/decode/lno1qcp4256ypqpq86q2pucnq42ngssx2an9wfujqerp0y2pqun4wd68jtn00fkxzcnn9ehhyec6qgqsz83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<pre>
+█████████████████████████████████████████████████████
+█████████████████████████████████████████████████████
+████ ▄▄▄▄▄ █▀▀▄▀█▄▀▄█ ▀▄▀█▀ ▀ ▀   ▄ ▄██▀▄█ ▄▄▄▄▄ ████
+████ █   █ █▀█▀▄▄ █▄▀▀ ▀ ▀▀▄ ▄▀▀▄▀▀ ▄ █ ▀█ █   █ ████
+████ █▄▄▄█ █▀ ▀ ▀▀  ▀█▀▄ ▄▄▄ ▄▀▀▄ ▄▄▄█▄▄▄█ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█▄█ ▀▄█ █ ▀▄█ █▄█ █▄▀ █ █ ▀▄▀ █▄▄▄▄▄▄▄████
+████  ▄▄ ▀▄ ▄   █▄▄▄▀█ ▄ ▄▄ ▄ ███ ▀▄▀▀█ ▀ █ ▀▄█ ▀████
+████▄▄▄▀▀ ▄ ▄ ██▀ █▄ ▄█ ▄██  █ █▀ ▀  ▀ ▀▀  ▀▀█▀▀▀████
+████ █▀██ ▄▀▀  ▄▄▄▀▄▄▀▄▄▄▄ ▀▄▀▄ ▀ ▀ ▀▄█▄▀██▀█▄▀  ████
+████▄ █ █▄▄▀██▀▄ ▀█▄ ▄█▀▄▄█▄  ▄▄ █▀█▀▀▄▄▀▄ ▄▀   ▀████
+████ ▀▄▄▄ ▄▀▀▄▄ █▀█▀█▄▀█▀█ ▀▄ █▀▀ ▀▄▀▄▄▄▀ █▄█▄██▀████
+████ █ ██▀▄▀▄▄█ ▄█▄▀██ ▀▄ ▄▄ ▄▄▀▀ ▀█▀▀ █▄▄▄█▀█ ▄▀████
+█████▄▀█ ▄▄▄ ▄▀▀ ▄▀▄▄▀▄▀ ▄▄▄ ▀▄▀▀▀ ▄███▀ ▄▄▄ ▄▀  ████
+██████▄▀ █▄█ ▀ ▀█▄ ▀▄▀ ▀ █▄█ ▄▄▀ ██▀  ▄▄ █▄█    █████
+████▀▄█  ▄▄▄▄  ▄ ▄▄▄▀▀  ▄▄ ▄▄▀▄█▀█ ██▄█▄▄▄ ▄▄█▀█▀████
+████▄███▀ ▄▀ ▀▄▄ █▄▄ █ ▀▀ ▀ ▀▄ ▀▀▄█ ▀█  ▀▀▀▄█ ▀▄█████
+█████ █▀█ ▄▄█   ▀ ▀▄▄▄▄▀▀▀▀█▀ █▀▀▄▀ ████▀██▀▄▄▀  ████
+████  █▀▄▀▄▄  ▄▀▀▀█  ▄██▄▀█▄▀█▄▄ ▄▀  ▄▄▀▄ ▀ ▄ ▀ ▀████
+████  ██▄▀▄ █▀ ▀▄▀█▀█▄▀ ▄█▀█▄████▀▀▀████▀█▄▄▄▄▀▄▀████
+█████▀▀▀ █▄ ▀ ▄▀█▀▄▀█▄▄█▀▀ ▄▀ ▄  ▀▀█▀▄ ▀█ ▀█▄  ▄█████
+████▄██▄▄█▄█  █▄▀▄▀█▄▄▄▀ ▄▄▄ ▄▄▀▀  ▄█▄██ ▄▄▄ █▀█ ████
+████ ▄▄▄▄▄ █▄▀▀▄▀▄  ▀▀   █▄█ ▄▄▄▀▄▀▀ ▀▄█ █▄█ █  █████
+████ █   █ █ █ ▄ ▄▄▄▀▀ █ ▄▄  ▀█ ▀  ▄▀█▄▀▄▄▄▄  ▀██████
+████ █▄▄▄█ █ ▄ ▄  █▄ ▀██ █▄▀█ ▄█ ▀▀▄ ▄▄   █ █▀▀█▄████
+████▄▄▄▄▄▄▄█▄████▄██▄▄▄▄██▄█▄████▄█▄█▄▄█▄▄▄██▄█▄█████
+█████████████████████████████████████████████████████
+█████████████████████████████████████████████████████
 	</pre>
       </dd>
     </dl>
