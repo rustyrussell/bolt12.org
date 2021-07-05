@@ -32,7 +32,7 @@ def handle_rpcerror(e):
 
 @app.route('/qrcode/<string>')
 def draw_qrcode(string):
-    img = qrcode.make(string)
+    img = qrcode.make(string, error_correction=qrcode.ERROR_CORRECT_L)
     buf = io.BytesIO()
     img.save(buf, format='PNG')
     return flask.Response(buf.getvalue(), mimetype='image/png')
@@ -164,9 +164,9 @@ def example_page():
               "bolt12": "lno1qcp4256ypqpq86q2pucnq42ngssx2an9wfujqerp0y2pqun4wd68jtn00fkxzcnn9ehhyec6qgqsz83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczlqsp9nyu4phcg6dqhlhzgxagfu7zh3d9re0sqp9ts2yfugvnnm9gxkcnnnkdpa084a6t520h5zhkxsdnghvpukvd43lastpwuh73k29qsy",
               "bolt12_unsigned": "lno1qcp4256ypqpq86q2pucnq42ngssx2an9wfujqerp0y2pqun4wd68jtn00fkxzcnn9ehhyec6qgqsz83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs" }]
 
-        DATE_JAN1_2021 = 1609421400
-        DAYS_SINCE = int((time.time() - DATE_JAN1_2021) // (60 * 60 * 24))
-        return flask.render_template('examples.html'.format(network),
+    DATE_JAN1_2021 = 1609421400
+    DAYS_SINCE = int((time.time() - DATE_JAN1_2021) // (60 * 60 * 24))
+    return flask.render_template('examples.html'.format(network),
                                  API=flask.request.base_url, NETWORK=network,
                                      EXAMPLES=examples, DAYS_SINCE=DAYS_SINCE)
 
