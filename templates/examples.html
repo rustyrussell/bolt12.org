@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <script type="text/javascript" src="qrcode.js"></script>
+  </head>
+  <body>
+    <h1>bootstrap.bolt12.org: {{NETWORK}} Examples</h1>
+    <p>
+      Here are several simple examples you can use for testing.
+    </p>
+    <h2>Simple non-recurring examples</h2>
+
+    <h3>The simplest possible offer: no amount specified.</h3>
+    Created by command: <tt>lightning-cli offer any "Offer by rusty's node"</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[0]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[0]['bolt12']}} (<a href="/decode/{{EXAMPLES[0]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[0]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[0]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[0]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <p>
+      Here's the how you'd fetch an invoice from it (in this case, for 100 msat):<br>
+      <a href="/fetchinvoice/{{EXAMPLES[0]['bolt12_unsigned']}}/100">/fetchinvoice/{{EXAMPLES[1]['bolt12_unsigned']}}/100</a>
+    </p>
+
+    <h3>An offer with a fixed amount (technically a minimum: you can tip), with a quantity so you can order more than one.  It also has a vendor field.</h3>
+    Created by command: <tt>lightning-cli offer amount=50 description="50msat multi-quantity offer" vendor="rustcorp.com.au" quantity_min=1</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[1]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[1]['bolt12']}} (<a href="/decode/{{EXAMPLES[1]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[1]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[1]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[1]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <p>
+      Here's the how you'd fetch an invoice from it (default amount, quantity 2):<br>
+      <a href="/fetchinvoice/{{EXAMPLES[1]['bolt12_unsigned']}}//2">/fetchinvoice/{{EXAMPLES[1]['bolt12_unsigned']}}//2</a>
+    </p>
+
+    <h2>Recurring examples</h2>
+    <h3>Simple offer asks for 100msat every minute:</h3>
+    Created by command: <tt>lightning-cli offer amount=100msat description="100msat every minute" vendor="rusty.ozlabs.org" recurrence=1minute</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[2]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[2]['bolt12']}} (<a href="/decode/{{EXAMPLES[2]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[2]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[2]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[2]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <p>
+      Here's the how you'd fetch the first invoice, using your super-secret payerkey of 010101...01:<br>
+      <a href="/fetchinvoicerecurring/{{EXAMPLES[2]['bolt12_unsigned']}}/0101010101010101010101010101010101010101010101010101010101010101/0">/fetchinvoicerecurring/{{EXAMPLES[2]['bolt12_unsigned']}}/0101010101010101010101010101010101010101010101010101010101010101/0</a>
+    </p>
+
+    <p>
+      Note that you cannot fetch the next invoice until that one is paid! (Hurry up, you only have a minute!).  Once you did, you could fetch again::<br>
+      <a href="/fetchinvoicerecurring/{{EXAMPLES[2]['bolt12_unsigned']}}/0101010101010101010101010101010101010101010101010101010101010101/1"></a>
+    </p>
+      
+    <h3>Offer asks for 100msat every minute, but only three times:</h3>
+    Created by command: <tt>lightning-cli offer amount=100msat description="100msat every minute, up to three times" vendor="rusty.ozlabs.org" recurrence=1minute recurrence_limit=2</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[3]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[3]['bolt12']}} (<a href="/decode/{{EXAMPLES[3]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[3]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[3]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[3]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <h3>Offer asks for 100msat every day, first period being 1 Jan 2021 (you can start at any period though):</h3>
+    Created by command: <tt>lightning-cli offer amount=100msat description="100msat every day, from 1-Jan-2021" vendor="rusty.ozlabs.org" recurrence=1day recurrence_base=$(date +%s -d 2021-01-01)</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[4]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[4]['bolt12']}} (<a href="/decode/{{EXAMPLES[4]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[4]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[4]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[4]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <p>
+      You need to calculate the current period, which depends on the current time (UTC).   I ran <tt>echo $(( ( $(date +%s) - $(date +%s -d 2021-01-01) ) / 3600 / 24 ))</tt> and it told me it was day 183 (it's 2021-07-03), so I can request invoices for 183 or 184 (default paywindow is that you can pay the current or nex period).
+      It's currently {{DAYS_SINCE}} days, so you can fetch your first invoice, using that super-secret payerkey of 010101...01:<br>
+      <a href="/fetchinvoicerecurring/{{EXAMPLES[4]['bolt12_unsigned']}}/0101010101010101010101010101010101010101010101010101010101010101/0/{{DAYS_SINCE}}">/fetchinvoicerecurring/{{EXAMPLES[4]['bolt12_unsigned']}}/0101010101010101010101010101010101010101010101010101010101010101/0/{{DAYS_SINCE}}</a>
+    </p>
+
+    <h3>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you can pay 1 hour early, or up to 60 seconds into the period</h3>
+    Created by command: <tt>lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pay 1hr before to 60 seconds late" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-3600+60</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[5]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[5]['bolt12']}} (<a href="/decode/{{EXAMPLES[5]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[5]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[5]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[5]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <h3>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you pay a percentage of the 10 days remaining (you can pay up to 10 days before)</h3>
+    Created by command: <tt>lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pro-rata" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-864000+864000%</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[6]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[6]['bolt12']}} (<a href="/decode/{{EXAMPLES[6]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[6]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[6]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[6]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+
+    <h3>Offer asks for up to $10 USD every day</h3>
+    Created by command: <tt>lightning-cli offer amount=10USD description="10USD every day" vendor="rusty.ozlabs.org" recurrence=1day</tt>
+    <dl>
+      <dt> offer_id </dt>
+      <dd> {{EXAMPLES[7]['offer_id']}} </dd>
+      <dt>bolt12</dt>
+      <dd> {{EXAMPLES[7]['bolt12']}} (<a href="/decode/{{EXAMPLES[7]['bolt12']}}">decode</a>)</dd>
+      <dt>bolt12_unsigned</dt>
+      <dd> {{EXAMPLES[7]['bolt12_unsigned']}} (<a href="/decode/{{EXAMPLES[7]['bolt12_unsigned']}}">decode</a>)</dd>
+      <dt>QR code:</dt>
+      <dd>
+	<img src="/qrcode/{{EXAMPLES[7]['bolt12_unsigned']}}">
+      </dd>
+    </dl>
+  </body>
+</html>
