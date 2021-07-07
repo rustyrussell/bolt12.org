@@ -6,6 +6,7 @@ import multiprocessing
 import logging
 import qrcode
 import io
+import os
 import time
 from markupsafe import escape
 
@@ -96,6 +97,11 @@ def fetchinvoice_recurring(offer, payerkey, counterstart):
     return inv
 
 
+@app.route('/.well-known/acme-challenge/<path:path>')
+def serve_le_challenge(path):
+    return flask.send_from_directory(os.getenv('HOME') + '/etc/dehydrated/acme-challenges/', path)
+
+
 @app.route('/status')
 def status():
     return plugin.rpc.getinfo()
@@ -176,7 +182,8 @@ def example_page():
 def flask_process(port, app, net):
     global network
     network = net
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, ssl_context=(os.getenv('HOME') + '/etc/dehydrated/certs/bootstrap.bolt12.org/fullchain.pem',
+                                                    os.getenv('HOME') + '/etc/dehydrated/certs/bootstrap.bolt12.org/privkey.pem'))
 
 
 @plugin.init()
