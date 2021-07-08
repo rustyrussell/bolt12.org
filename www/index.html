@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>bolt12.org: Lightning's Native Experience, Everywhere</title>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <div class="container">
+      <h1>Offers: Lightning's Native Experience, Everywhere</h1>
+
+      <p>
+	Offers is
+	a <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">draft
+	  specification</a> for Lightning wallets and nodes, with
+	experimental support already in <a href="https://github.com/ElementsProject/lightning/">c-lightning</a>
+      </p>
+
+      <h2>Experience</h2>
+
+      <div class="row">
+	<div class="col-1" style="text-align: center">
+	  <img src="lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs.png" class="img-fluid">
+	  BOLT 12 "Offer"
+	</div>
+	<div class="col-9">
+	<p>
+	  You scan a QR code, your wallet prompts you to pay it, just like BOLT11 invoices today (show right).
+	</p>
+
+	<p>
+	  But it could also prompt you to pay every day, hour, week or
+	  even minute.  It might be in a different currency, say USD.
+	</p>
+
+	<p>
+	  Or, it can offers to send <b>you</b> money, like for an ATM.
+	</p>
+
+	<p>
+	  And unlike invoices, you can (and should!) reuse them: a static image on your web page, a QR code on your billboard.  The offer to the left can be used by as many people as want to: the invoice on the right can only be used once, <em>and is insecure if someone else tries to reuse it!</em>
+	</p>
+	</div>
+	<div class="col-2" style="text-align: center">
+	  <img src="bolt11.png" class="img-fluid">
+	  BOLT 11 Invoice
+	</div>
+      </div>
+      
+      <h2>How It Works</h2>
+
+      <p>
+	An "offer" has enough information for you to reach out and fetch a real invoice from the vendor, <em>through the Lightning Network itself</em>, just like it would send a payment: no web server needed. Your wallet then pays the actual invoice (or, for a "send invoice" offer, your wallet sends an invoice which the vendor pays, as an ATM or refund would use).
+      </p>
+
+      <p>
+	This means that offers can be <b>much smaller</b> than invoices, and contain more information (recurrence, currency, vendor name, quantity limits, blinded paths to reach the vendor).
+      </p>
+
+      <h2>Who</h2>
+
+      <p>
+	I am <a href="https://rusty.ozlabs.org">Rusty Russell</a>, lead developer of c-lightning for <a href="https://blockstream.com">Blockstream</a>, which was the first implementation of the lightning network, and was the original chair of the <a href="https://github.com/lightningnetwork/lightning-rfc">Lightning Specification</a> process.  I also wrote the BOLT11 specification which defines lightning invoices used today, and so am very familiar with its limitations as the Lightning Network becomes ever more sophisticated.
+      </p>
+
+      <h2>Deployment</h2>
+
+      <p>
+	The draft was first posted September 2020, and revised heavily since. It was first implemented in <a href="https://github.com/ElementsProject/lightning/releases/v0.9.3">c-lightning v0.9.3</a> released in January 2021, but since increased feedback and implementations come on board, <b>it could change again</b>.
+      </p>
+
+      <p style="text-align:center">
+	<b style="font-size:150%;">DO NOT GET AN OFFER TATTOO UNTIL SPEC IS FULLY RATIFIED!</b>
+      </p>
+
+      <p>
+	<a href="https://github.com/lightningnetwork/lightning-rfc/pull/759">Onion messages</a> are still in draft, too, though simple to implement: the current c-lightning implementation opens a direct connection to send onion messages if it needs to (bad for privacy unless you're using Tor!).
+      </p>
+
+      <p>
+	There's a REST API to decode offers, request invoices, and decode the invoices at <a href="https://bootstrap.bolt12.org">bootstrap.bolt12.org</a>; this includes extensive <a href="https://bootstrap.bolt12.org/examples">examples</a> for usage.  Obviously using this API exposes your information, but it makes wallet support trivial.
+      </p>
+
+      <h2>Technology</h2>
+
+      <p>
+	Offers are defined in the draft specification as BOLT12 (vs BOLT11 which defines invoices today); you can review the draft <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">on GitHub</a>
+      </p> 
+
+      <div class="container-fluid">
+	<div class="row">
+	  <div class="col-sm">
+	    <h3>Onion Messages</h3>
+	    <p>
+	      Using the same onion mechanism we use to send payments, without the actual payment part. You can (and people do!) use fake payments to send messages today, but it's 3x slower and consumes far more resources on each hop.
+	    </p>
+	  </div>
+	  <div class="col-sm">
+	    <h3>Blinded Paths</h3>
+	    <p>
+	      This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the vendor, if they want to.
+	    </p>
+	  </div>
+	  <div class="col-sm">
+	    <h3>Schnorr Signatures</h3>
+	    <p>
+	      BOLT 12 uses Schnorr signatures throughout, which make implementing multisig Lightning nodes transparently possible in future.
+	    </p>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="col-sm">
+	    <h3>BIP 340</h3>
+	    <p>
+	      BOLT 12 uses x-only public keys (trivially backwards compatible for current nodes which use SEC-1 encoded compressed keys) which are slightly shorter, and uses the same signature scheme as Taproot.
+	    </p>
+	  </div>
+	  <div class="col-sm">
+	    <h3>Payer proofs</h3>
+	    <p>
+	      Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the vendor can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
+	    </p>
+	  </div>
+	  <div class="col-sm">
+	    <h3>Merkle Trees</h3>
+	    <p>
+	      Offers are technically a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
+	    </p>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="col-sm">
+	    <h3>Wire protocol</h3>
+	    <p>
+	      Offers, invoice requests and invoices are encoded using the exact same protocol as the Lightning Network uses today, just represented using the QR-code friendly bech32 character set.
+	    </p>
+	  </div>
+	  <div class="col-sm">
+	    <h3>Extensible</h3>
+	    <p>
+	      By using the compatibility schemes already used by the Lightning Network (feature bits, new fields) it's easy to expand for new uses in the future.  There are already a few extension proposals!
+	    </p>
+	  </div>
+	  <div class="col-sm">
+	    <h3>Native</h3>
+	    <p>
+	      By using the Lightning Network to send messages, there's no need to run a web server or even deal with that: your lightning node does all the work of serving invoices for offers, and taking the money.
+	    </p>
+	  </div>
+	</div>
+      </div>
+
+      <h2>Examples</h2>
+      You can see some simple examples on the <a href="https://bootstrap.bolt12.org/examples">BOLT12 API Examples page</a>.
+    </div>
+  </body>
+</html>
