@@ -10,6 +10,7 @@ import os
 import time
 from markupsafe import escape
 
+
 # This makes sure flask can marshall Millisatoshi values.
 class MsatJSONEncoder(flask.json.JSONEncoder):
     def default(self, o):
@@ -31,12 +32,9 @@ def handle_rpcerror(e):
             400)
 
 
-@app.route('/qrcode/<string>')
-def draw_qrcode(string):
-    img = qrcode.make(string, error_correction=qrcode.ERROR_CORRECT_L)
-    buf = io.BytesIO()
-    img.save(buf, format='PNG')
-    return flask.Response(buf.getvalue(), mimetype='image/png')
+@app.route('/qrcode/<path>')
+def send_qrcode(path):
+    flask.send_from_directory(os.getenv('HOME') + 'bolt12.org/bootstrap/qrcodes/', path)
 
 
 @app.route('/decode/<bolt12>', methods=['GET'])
@@ -104,6 +102,7 @@ def serve_le_challenge(path):
 
 @app.route('/status')
 def status():
+    return {'status': 'sane'}
     return plugin.rpc.getinfo()
 
 
@@ -172,18 +171,18 @@ def example_page():
 
     DATE_JAN1_2021 = 1609421400
     DAYS_SINCE = int((time.time() - DATE_JAN1_2021) // (60 * 60 * 24))
-    return flask.render_template('examples.html'.format(network),
-                                 API=flask.request.base_url, NETWORK=network,
-                                     EXAMPLES=examples, DAYS_SINCE=DAYS_SINCE)
+    return flask.render_template('examples.html',
+                                 API=flask.request.base_url,
+                                 NETWORK=network,
+                                 EXAMPLES=examples, DAYS_SINCE=DAYS_SINCE)
 
 
 # This is stolen entirely from Rene Pickhardt's donations plugin:
 # https://github.com/lightningd/plugins/tree/master/donations
-def flask_process(port, app, net):
+def flask_process(port, app, net, ssl_context):
     global network
     network = net
-    app.run(host="0.0.0.0", port=port, ssl_context=(os.getenv('HOME') + '/etc/dehydrated/certs/bootstrap.bolt12.org/fullchain.pem',
-                                                    os.getenv('HOME') + '/etc/dehydrated/certs/bootstrap.bolt12.org/privkey.pem'))
+    app.run(host="0.0.0.0", port=port, ssl_context=ssl_context)
 
 
 @plugin.init()
@@ -192,8 +191,15 @@ def init(options, configuration, plugin):
 
     network = plugin.rpc.getinfo()['network']
     port = int(options['bootstrap-api-port'])
-    p = multiprocessing.Process(target=flask_process,
-                                args=[port, app, network],
+    if options['bootstrap-ssl']:
+        ssl_context = (os.getenv('HOME')
+                       + '/etc/dehydrated/certs/bootstrap.bolt12.org/fullchain.pem',
+                       os.getenv('HOME')
+                       + '/etc/dehydrated/certs/bootstrap.bolt12.org/privkey.pem')
+    else:
+        ssl_context = None
+        p = multiprocessing.Process(target=flask_process,
+                                args=[port, app, network, ssl_context],
                                 name="server on port {}".format(port))
     p.start()
 
@@ -207,6 +213,12 @@ plugin.add_option(
     'bootstrap-log-file',
     '/tmp/bootstrap.log',
     'Where should logs go?'
+)
+plugin.add_option(
+    'bootstrap-ssl',
+    'true',
+    'Should we serve ssl as well?',
+    'bool'
 )
 
 plugin.run()
