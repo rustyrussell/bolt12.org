@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-from pyln.client import LightningRpc
+from pyln.client import LightningRpc, RpcError
 from bootstrap import rpc_decode, rpc_fetchinvoice, rpc_fetchinvoice_recurring, rpc_status
 import flask
 import os
@@ -11,6 +11,13 @@ sys.path.insert(0, '/home/rusty/bolt12.org/wsgi/bootstrap.wsgi')
 
 application = flask.Flask('bootstrap')
 rpc = LightningRpc('/home/rusty/.lightning/bitcoin/lightning-rpc')
+
+
+@application.errorhandler(RpcError)
+def handle_rpcerror(e):
+    return ('Bad request: {} returned {}'.format(e.method, e.error),
+            400)
+
 
 @application.route('/decode/<bolt12>', methods=['GET'])
 def decode(bolt12):
