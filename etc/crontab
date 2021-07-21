@@ -1,0 +1,4 @@
+@reboot /usr/local/bin/bitcoind > /home/rusty/log/bitcoind-mainnet.log 2>&1 &
+PATH=/usr/bin:/bin:/usr/local/bin
+@reboot /home/rusty/bin/lightningd > /home/rusty/log/lightningd.out 2>&1 &
+10 20 * * 1 dehydrated -f /home/rusty/etc/dehydrated/config.sh -c
