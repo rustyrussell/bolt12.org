@@ -26,13 +26,13 @@ def decode(bolt12):
     return rpc_decode(rpc, bolt12)
 
 
-@application.route('/fetchinvoice/<path:omq>', methods=['POST'])
+@application.route('/fetchinvoice/<path:omq>', methods=['GET', 'POST'])
 def fetchinvoice(omq):
     return rpc_fetchinvoice(rpc, omq)
 
 
 @application.route('/fetchinvoicerecurring/<offer>/<payerkey>/<path:counterstart>',
-           methods=['POST'])
+           methods=['GET', 'POST'])
 def fetchinvoice_recurring(offer, payerkey, counterstart):
     return rpc_fetchinvoice_recurring(rpc, offer, payerkey, counterstart)
 
