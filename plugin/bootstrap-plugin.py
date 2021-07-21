@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # LICENSE: MIT / APACHE
 from pyln.client import Plugin, RpcError, LightningRpc
+from bootstrap import rpc_decode, rpc_fetchinvoice, rpc_fetchinvoice_recurring, rpc_status
 import flask
 import multiprocessing
 import logging
@@ -20,90 +21,29 @@ class MsatJSONEncoder(flask.json.JSONEncoder):
             pass
         return __super__.default(self, o)
 
-
 plugin = Plugin()
 flask.Flask.json_encoder = MsatJSONEncoder
 app = flask.Flask('bootstrap')
 
-
-@app.errorhandler(RpcError)
-def handle_rpcerror(e):
-    return ('Bad request: {} returned {}'.format(e.method, e.error),
-            400)
-
-
-@app.route('/qrcode/<path>')
-def send_qrcode(path):
-    flask.send_from_directory(os.getenv('HOME') + 'bolt12.org/bootstrap/qrcodes/', path)
-
-
 @app.route('/decode/<bolt12>', methods=['GET'])
 def decode(bolt12):
-    return plugin.rpc.decode(bolt12)
+    return rpc_decode(plugin.rpc, bolt12)
 
 
-def take_first_or_none(l):
-    if len(l) == 0:
-        return None
-    v = l.pop(0)
-    if v == '':
-        return None
-    return v
-
-
-@app.route('/fetchinvoice/<path:omq>', methods=['GET'])
+@app.route('/fetchinvoice/<path:omq>', methods=['POST'])
 def fetchinvoice(omq):
-    argdict = {}
-    args = escape(omq).split('/')
-
-    argdict['offer'] = take_first_or_none(args)
-    if argdict['offer'] is None:
-        return ('Bad request: needs offer arg: '
-                '/offer/[[msatsoshi/]quantity/]', 400)
-
-    argdict['msatoshi'] = take_first_or_none(args)
-    argdict['quantity'] = take_first_or_none(args)
-    if len(args) != 0:
-        return ('Bad request: only takes 1-3 params: '
-                '/offer/[[msatsoshi/]quantity/]', 400)
-
-    inv = plugin.rpc.call('fetchinvoice', argdict)
-    # Save them the round trip
-    inv['decoded'] = plugin.rpc.decode(inv['invoice'])
-    return inv
+    return rpc_fetchinvoice(plugin.rpc, omq)
 
 
 @app.route('/fetchinvoicerecurring/<offer>/<payerkey>/<path:counterstart>',
-           methods=['GET'])
+           methods=['POST'])
 def fetchinvoice_recurring(offer, payerkey, counterstart):
-    argdict = {'offer': offer,
-               'payer_secret': payerkey}
-    args = escape(counterstart).split('/')
-
-    argdict['recurrence_counter'] = take_first_or_none(args)
-    if argdict['offer'] is None:
-        return ('Bad request: needs counter arg: '
-                ' /offer/payerkey/counter/[start]/', 400)
-    argdict['recurrence_start'] = take_first_or_none(args)
-    if len(args) != 0:
-        return ('Bad request: only takes 3 or 4 params:'
-                ' /offer/payerkey/counter/[start]/', 400)
-
-    inv = plugin.rpc.call('fetchinvoice', argdict)
-    # Save them the round trip
-    inv['decoded'] = plugin.rpc.decode(inv['invoice'])
-    return inv
-
-
-@app.route('/.well-known/acme-challenge/<path:path>')
-def serve_le_challenge(path):
-    return flask.send_from_directory(os.getenv('HOME') + '/etc/dehydrated/acme-challenges/', path)
+    return rpc_fetchinvoice_recurring(plugin.rpc, offer, payerkey, counterstart)
 
 
 @app.route('/status')
 def status():
-    return {'status': 'sane'}
-    return plugin.rpc.getinfo()
+    return rpc_status(plugin.rpc)
 
 
 @app.route('/')
