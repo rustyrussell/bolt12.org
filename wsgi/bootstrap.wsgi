@@ -37,6 +37,11 @@ def fetchinvoice_recurring(offer, payerkey, counterstart):
     return rpc_fetchinvoice_recurring(rpc, offer, payerkey, counterstart)
 
 
+@application.route('/rawinvreq/<invreq>/<nodeid>', methods=['GET', 'POST'])
+def rawinvreq(invreq, nodeid):
+    return rpc_rawfetch(rpc, invreq, nodeid)
+
+
 @application.route('/status')
 def status():
     return rpc_status(rpc)

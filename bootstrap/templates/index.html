@@ -75,6 +75,12 @@
       unless that was the final permitted payment there is a <tt>next_period</tt>
       which indicates the next COUNTER, and when the next fetch is possible.
     </p>
+    <h2 id="rawinvreq"> {{ API }}rawinvreq/INVREQ/NODEID (GET, POST) </h2>
+    <p>
+      This low-level API sends a raw invreq message through the
+      network to nodeid, waits up to 60 seconds for an invoice, and as
+      a courtesy, decodes it.  Returns a <tt>application/json</tt>.
+    </p>
     <h2 id="status"> {{ API }}status (GET) </h2>
     <p>
       Runs getinfo so you can see if the node has fallen over.

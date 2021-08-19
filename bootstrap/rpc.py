@@ -58,6 +58,13 @@ def rpc_fetchinvoice_recurring(rpc, offer, payerkey, counterstart):
     return inv
 
 
+def rpc_rawfetch(rpc, invreq, nodeid):
+    inv = rpc.call('dev-rawrequest', {'invreq': invreq, 'nodeid': nodeid})
+    # Save them the round trip
+    inv['decoded'] = rpc.decode(inv['invoice'])
+    return inv
+
+
 def rpc_status(rpc):
     return rpc.getinfo()
 
