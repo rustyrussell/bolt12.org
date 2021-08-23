@@ -1,6 +1,6 @@
 #! /usr/bin/python3
 from pyln.client import LightningRpc, RpcError
-from bootstrap import rpc_decode, rpc_fetchinvoice, rpc_fetchinvoice_recurring, rpc_status
+from bootstrap import rpc_decode, rpc_fetchinvoice, rpc_fetchinvoice_recurring, rpc_status, rpc_rawfetch
 import flask
 import os
 import sys
