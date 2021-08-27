@@ -1,5 +1,5 @@
 <html>
-  <head><title>BOLT #12: Revision c2b3901d4959d889ad9b02873e8315bd1cd5bf63</title>
+  <head><title>BOLT #12: Revision 9309ab5917ea576bfc741e9d0f7206e5f86fc822</title>
   </head>
   <body>
     <!-- Thanks to https://markdowntohtml.com/ for the conversion! -->
@@ -208,9 +208,9 @@ also designed for compactness, to easily fit inside a QR code.</p>
 <li>[<code>...*blinded_path</code>:<code>paths</code>]</li>
 </ul>
 </li>
-<li>type: 20 (<code>vendor</code>)</li>
+<li>type: 20 (<code>issuer</code>)</li>
 <li>data:<ul>
-<li>[<code>...*utf8</code>:<code>vendor</code>]</li>
+<li>[<code>...*utf8</code>:<code>issuer</code>]</li>
 </ul>
 </li>
 <li>type: 22 (<code>quantity_min</code>)</li>
@@ -249,7 +249,7 @@ also designed for compactness, to easily fit inside a QR code.</p>
 </li>
 <li>type: 30 (<code>node_id</code>)</li>
 <li>data:<ul>
-<li>[<code>pubkey32</code>:<code>node_id</code>]</li>
+<li>[<code>point32</code>:<code>node_id</code>]</li>
 </ul>
 </li>
 <li>type: 54 (<code>send_invoice</code>)</li>
@@ -387,7 +387,7 @@ becomes more complex, as an implementation probably does not want to
 prompt the user on every payment, but receive some initial
 authorization to spend within a range (e.g. &quot;Pay $5 AUD once a
 week?&quot;).  In particular, the authorization may be in the user&#39;s native
-currency, not the vendor&#39;s currency nor in Bitcoin.</p>
+currency, not the issuer&#39;s currency nor in Bitcoin.</p>
 <p>For example, consider an offer with weekly recurrence (<code>time_unit</code>=1,
 <code>period</code>=7), <code>amount</code> 500, <code>currency</code> <code>AUD</code> ($5 Australian dollars).
 An implementation may present this to the user as USD $3.53 (max
@@ -461,8 +461,13 @@ publicly reachable nodes.</li>
 <li>SHOULD ignore any invoice_request which does not use the path.</li>
 </ul>
 </li>
-<li>if it sets <code>vendor</code>:<ul>
+<li>if it sets <code>issuer</code>:<ul>
 <li>SHOULD set it to clearly identify the issuer of the invoice.</li>
+<li>if it includes a domain name:<ul>
+<li>SHOULD begin it with either user@domain or domain</li>
+<li>MAY follow with a space and more text</li>
+</ul>
+</li>
 </ul>
 </li>
 <li>if it can supply more than one item for a single invoice<ul>
@@ -581,10 +586,6 @@ invoice.</li>
 <li>MUST NOT respond to the offer.</li>
 </ul>
 </li>
-<li>if <code>description</code> is not present:<ul>
-<li>MUST NOT respond to the offer.</li>
-</ul>
-</li>
 <li>if <code>signature</code> is present, but is not a valid signature using <code>node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>:<ul>
 <li>MUST NOT respond to the offer.</li>
 </ul>
@@ -652,7 +653,7 @@ invoices is <code>lnr</code>.</p>
 </li>
 <li>type: 38 (<code>payer_key</code>)</li>
 <li>data:<ul>
-<li>[<code>pubkey32</code>:<code>key</code>]</li>
+<li>[<code>point32</code>:<code>key</code>]</li>
 </ul>
 </li>
 <li>type: 39 (<code>payer_note</code>)</li>
@@ -768,7 +769,14 @@ yet begun.</li>
 <p>The reader of an invoice_request:</p>
 <ul>
 <li>MUST fail the request if <code>payer_key</code> is not present.</li>
-<li>MUST fail the request if <code>chains</code> does not include (or imply) a supported chain.</li>
+<li>if <code>chains</code> is not present:<ul>
+<li>MUST fail the request if bitcoin is not a supported chain.</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST fail the request if <code>chains</code> does not include a supported chain.</li>
+</ul>
+</li>
 <li>MUST fail the request if <code>features</code> contains unknown even bits.</li>
 <li>MUST fail the request if <code>offer_id</code> is not present.</li>
 <li>MUST fail the request if the <code>offer_id</code> does not refer to an unexpired offer.</li>
@@ -948,14 +956,14 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 <li>[<code>...*u64</code>:<code>incoming_msat</code>]</li>
 </ul>
 </li>
-<li>type: 20 (<code>vendor</code>)</li>
+<li>type: 20 (<code>issuer</code>)</li>
 <li>data:<ul>
-<li>[<code>...*utf8</code>:<code>vendor</code>]</li>
+<li>[<code>...*utf8</code>:<code>issuer</code>]</li>
 </ul>
 </li>
 <li>type: 30 (<code>node_id</code>)</li>
 <li>data:<ul>
-<li>[<code>pubkey32</code>:<code>node_id</code>]</li>
+<li>[<code>point32</code>:<code>node_id</code>]</li>
 </ul>
 </li>
 <li>type: 32 (<code>quantity</code>)</li>
@@ -986,7 +994,7 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 </li>
 <li>type: 38 (<code>payer_key</code>)</li>
 <li>data:<ul>
-<li>[<code>pubkey32</code>:<code>key</code>]</li>
+<li>[<code>point32</code>:<code>key</code>]</li>
 </ul>
 </li>
 <li>type: 39 (<code>payer_note</code>)</li>
@@ -1021,7 +1029,7 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 </li>
 <li>type: 48 (<code>fallbacks</code>)</li>
 <li>data:<ul>
-<li>[<code>u8</code>:<code>num</code>]</li>
+<li>[<code>byte</code>:<code>num</code>]</li>
 <li>[<code>num*fallback_address</code>:<code>fallbacks</code>]</li>
 </ul>
 </li>
@@ -1168,7 +1176,7 @@ or MUST not set it.</li>
 <li>MUST append the reason to <code>description</code> (e.g. &quot; 5% bulk discount&quot;).</li>
 </ul>
 </li>
-<li>MUST set (or not set) <code>vendor</code> exactly as the offer did.</li>
+<li>MUST set (or not set) <code>issuer</code> exactly as the offer did.</li>
 <li>MUST NOT set <code>refund_for</code></li>
 <li>MUST NOT set <code>refund_signature</code></li>
 </ul>
@@ -1236,7 +1244,7 @@ exactly as they are in the <code>invoice_request:</code><ul>
 <li>SHOULD confirm authorization if the <code>description</code> does not exactly
 match the <code>offer</code></li>
 <li>MAY highlight if <code>description</code> has simply had a change appended.</li>
-<li>SHOULD confirm authorization if <code>vendor</code> does not exactly
+<li>SHOULD confirm authorization if <code>issuer</code> does not exactly
 match the <code>offer</code>.</li>
 </ul>
 </li>
@@ -1375,5 +1383,4 @@ invoice, to make a shopping list.</li>
 <li>Recurrent invoice requests?</li>
 </ol>
 <p>[1] <a href="https://www.youtube.com/watch?v=4SYc_flMnMQ">https://www.youtube.com/watch?v=4SYc_flMnMQ</a></p>
-</body>
-</html>
+</body></html>
