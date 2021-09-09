@@ -95,63 +95,81 @@
 
      <div class="container-fluid">
 	<div class="row">
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Onion Messages</h3>
-	    <p>
-	      Using the same onion mechanism we use to send payments, without the actual payment part. You can (and people do!) use fake payments to send messages today, but it's 3x slower and consumes far more resources on each hop.
-	    </p>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Onion Messages</h3>
+			<p>
+			  Using the same onion mechanism we use to send payments, without the actual payment part. You can (and people do!) use fake payments to send messages today, but it's 3x slower and consumes far more resources on each hop.
+			</p>
+		</div>
 	  </div>
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Blinded Paths</h3>
-	    <p>
-	      This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the vendor, if they want to.
-	    </p>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Blinded Paths</h3>
+			<p>
+			  This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the vendor, if they want to.
+			</p>
+		</div>
 	  </div>
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Schnorr Signatures</h3>
-	    <p>
-	      BOLT 12 uses Schnorr signatures throughout, which make implementing multisig Lightning nodes transparently possible in future.
-	    </p>
-	  </div>
-	</div>
-	<div class="row">
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>BIP 340</h3>
-	    <p>
-	      BOLT 12 uses x-only public keys (trivially backwards compatible for current nodes which use SEC-1 encoded compressed keys) which are slightly shorter, and uses the same signature scheme as Taproot.
-	    </p>
-	  </div>
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Payer proofs</h3>
-	    <p>
-	      Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the vendor can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
-	    </p>
-	  </div>
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Merkle Trees</h3>
-	    <p>
-	      Offers are technically a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
-	    </p>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Schnorr Signatures</h3>
+			<p>
+			  BOLT 12 uses Schnorr signatures throughout, which make implementing multisig Lightning nodes transparently possible in future.
+			</p>
+		</div>
 	  </div>
 	</div>
 	<div class="row">
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Wire protocol</h3>
-	    <p>
-	      Offers, invoice requests and invoices are encoded using the exact same protocol as the Lightning Network uses today, just represented using the QR-code friendly bech32 character set.
-	    </p>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">BIP 340</h3>
+			<p>
+			  BOLT 12 uses x-only public keys (trivially backwards compatible for current nodes which use SEC-1 encoded compressed keys) which are slightly shorter, and uses the same signature scheme as Taproot.
+			</p>
+		</div>
 	  </div>
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Extensible</h3>
-	    <p>
-	      By using the compatibility schemes already used by the Lightning Network (feature bits, new fields) it's easy to expand for new uses in the future.  There are already a few extension proposals!
-	    </p>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Payer proofs</h3>
+			<p>
+			  Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the vendor can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
+			</p>
+		</div>
 	  </div>
-	  <div class="col-sm border rounded m-sm-3">
-	    <h3>Native</h3>
-	    <p>
-	      By using the Lightning Network to send messages, there's no need to run a web server or even deal with that: your lightning node does all the work of serving invoices for offers, and taking the money.
-	    </p>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Merkle Trees</h3>
+			<p>
+			  Offers are technically a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
+			</p>
+		</div>
+	  </div>
+	</div>
+	<div class="row">
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Wire protocol</h3>
+			<p>
+			  Offers, invoice requests and invoices are encoded using the exact same protocol as the Lightning Network uses today, just represented using the QR-code friendly bech32 character set.
+			</p>
+		</div>
+	  </div>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+			<h3 class="card-title">Extensible</h3>
+			<p>
+			  By using the compatibility schemes already used by the Lightning Network (feature bits, new fields) it's easy to expand for new uses in the future.  There are already a few extension proposals!
+			</p>
+		</div>
+	  </div>
+	  <div class="col-sm card m-3">
+		<div class="card-body">
+		  <h3 class="card-title">Native</h3>
+			<p>
+			  By using the Lightning Network to send messages, there's no need to run a web server or even deal with that: your lightning node does all the work of serving invoices for offers, and taking the money.
+			</p>
+		</div>
 	  </div>
 	</div>
       </div>
