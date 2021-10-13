@@ -1,5 +1,5 @@
 <html>
-  <head><title>BOLT #12: Revision 9309ab5917ea576bfc741e9d0f7206e5f86fc822</title>
+  <head><title>BOLT #12: Revision 2c0bcfe2c5ceffeeecb928ee322d3dd3099cd195</title>
   </head>
   <body>
     <!-- Thanks to https://markdowntohtml.com/ for the conversion! -->
@@ -20,7 +20,7 @@
 limitations:</p>
 <ol>
 <li>The entangling of bech32 encoding makes it awkward to send
-in other forms (i.e. inside the lightning network itself).</li>
+in other forms (e.g. inside the lightning network itself).</li>
 <li>The signature applying to the entire invoice makes it impossible
 to prove an invoice without revealing its entirety.</li>
 <li>Fields cannot generally be extracted for external use: the <code>h</code>
@@ -56,7 +56,7 @@ using an <em>invoice_request</em> message.</li>
 <li>The merchant provides a user-specific <em>offer</em> (&quot;take my money&quot;) in a web page or QR code,
 with an amount (for a refund, also a reference to the to-be-refunded
 invoice).</li>
-<li>A user sends an <em>invoice</em> for the amount in the <em>offer</em> (for a
+<li>The user sends an <em>invoice</em> for the amount in the <em>offer</em> (for a
 refund, a proof that they requested the original)</li>
 <li>The merchant makes a payment to the user indicated by the invoice.</li>
 </ol>
@@ -65,13 +65,6 @@ refund, a proof that they requested the original)</li>
 invoice was paid (by showing the preimage of the <code>payment_hash</code>), not who paid
 it.  The merchant can claim an invoice was paid, and once revealed, anyone can
 claim they paid the invoice, too.[1]</p>
-<ol>
-<li>Sharing the minimum information required to prove sections of the
-invoice in dispute (e.g. the description of the item, the payment
-hash, and the merchant&#39;s signature).</li>
-<li>Contain a transferable proof that the user is the one who was
-responsible for paying the invoice in the first place.</li>
-</ol>
 <p>Providing a key in <em>invoice_request</em> allows a user to prove that they were the one
 to request the invoice.  In addition, the Merkle construction of the BOLT 12
 invoice signature allows the user to selectively reveal fields of the invoice
@@ -113,54 +106,54 @@ SHA256(SHA256(<code>tag</code>) || SHA256(<code>tag</code>) || <code>msg</code>)
 as the signature of H(<code>tag</code>,<code>msg</code>) using <code>key</code>.</p>
 <p>Each form is signed using one or more TLV signature elements; TLV
 types 240 through 1000 are considered signature elements.  For these
-the tag is <code>lightning</code> | <code>messagename</code> | <code>fieldname</code>, and <code>msg</code> is the
-Merkle-root; <code>lightning</code> is the literal 9-byte ASCII string,
-<code>messagename</code> is the name of the TLV stream being signed (i.e. <code>offer</code>, <code>invoice_request</code> or <code>invoice</code>) and the <code>fieldname</code> is the TLV field containing the
-signature (e.g. <code>signature</code> or <code>payer_signature</code>).</p>
+the tag is &quot;lightning&quot; || <code>messagename</code> || <code>fieldname</code>, and <code>msg</code> is the
+Merkle-root; &quot;lightning&quot; is the literal 9-byte ASCII string,
+<code>messagename</code> is the name of the TLV stream being signed (i.e. &quot;offer&quot;, &quot;invoice_request&quot; or &quot;invoice&quot;) and the <code>fieldname</code> is the TLV field containing the
+signature (e.g. &quot;signature&quot; or &quot;payer_signature&quot;).</p>
 <p>The formulation of the Merkle tree is similar to that proposed in
-[BIP-taproot], with the each TLV leaf paired with a nonce leaf to avoid
+[BIP-taproot], with each TLV leaf paired with a nonce leaf to avoid
 revealing adjacent nodes in proofs (assuming there is a non-revealed TLV
 which has enough entropy).</p>
 <p>The Merkle tree&#39;s leaves are, in TLV-ascending order for each tlv:</p>
 <ol>
 <li>The H(<code>LnLeaf</code>,tlv).</li>
-<li>The H(<code>LnAll</code>|all-tlvs,tlv) where &quot;all-tlvs&quot; consists of all non-signature TLV entries appended in ascending order.</li>
+<li>The H(<code>LnAll</code>||all-tlvs,tlv) where &quot;all-tlvs&quot; consists of all non-signature TLV entries appended in ascending order.</li>
 </ol>
-<p>The Merkle tree inner nodes are H(<code>LnBranch</code>, lesser-SHA256|greater-SHA256);
+<p>The Merkle tree inner nodes are H(<code>LnBranch</code>, lesser-SHA256||greater-SHA256);
 this ordering means that proofs are more compact since left/right is
 inherently determined.</p>
 <p>If there are not exactly a power of 2 leaves, then the tree depth will
 be uneven, with the deepest tree on the lowest-order leaves.</p>
 <p>e.g. consider the encoding of an <code>offer</code> <code>signature</code> with TLVs TLV1, TLV2 and TLV3:</p>
-<pre><code>L1=H(`LnLeaf`,TLV1)
-L1nonce=H(`LnAll`|TLV1|TLV2|TLV3,TLV1) 
-L2=H(`LnLeaf`,TLV2)
-L2nonce=H(`LnAll`|TLV1|TLV2|TLV3,TLV2) 
-L3=H(`LnLeaf`,TLV3)
-L3nonce=H(`LnAll`|TLV1|TLV2|TLV3,TLV3) 
+<pre><code>L1=H(<span class="hljs-string">"LnLeaf"</span>,TLV1)
+L1nonce=H(<span class="hljs-string">"LnAll"</span>|<span class="hljs-type">|TLV1</span>|<span class="hljs-type">|TLV2</span>|<span class="hljs-type">|TLV3</span>,TLV1) 
+L2=H(<span class="hljs-string">"LnLeaf"</span>,TLV2)
+L2nonce=H(<span class="hljs-string">"LnAll"</span>|<span class="hljs-type">|TLV1</span>|<span class="hljs-type">|TLV2</span>|<span class="hljs-type">|TLV3</span>,TLV2) 
+L3=H(<span class="hljs-string">"LnLeaf"</span>,TLV3)
+L3nonce=H(<span class="hljs-string">"LnAll"</span>|<span class="hljs-type">|TLV1</span>|<span class="hljs-type">|TLV2</span>|<span class="hljs-type">|TLV3</span>,TLV3) 
 
 Assume L1 &lt; L1nonce, and L2 &gt; L2nonce.
 
-   L1    L1nonce                      L2   L2nonce               L3
-     \   /                             \   /                     |
-      v v                               v v                      v
-L1A=H(<span class="hljs-string">'LnBranch'</span>,L1|L1nonce) L2A=H(<span class="hljs-string">'LnBranch'</span>,L2nonce|L2)       L3
+   L1    L1nonce                      L2   L2nonce                L3   L3nonce
+     \   /                             \   /                       \   /
+      v v                               v v                         v v
+L1A=H(<span class="hljs-string">"LnBranch"</span>,L1|<span class="hljs-type">|L1nonce</span>) L2A=H(<span class="hljs-string">"LnBranch"</span>,L2nonce|<span class="hljs-type">|L2</span>)  L3A=H(<span class="hljs-string">"LnBranch"</span>,L3nonce|<span class="hljs-type">|L3</span>)
 
 Assume L1A &lt; L2A:
 
-       L1A   L2A                                 L3
+       L1A   L2A                                 L3A=H(<span class="hljs-string">"LnBranch"</span>,L3nonce|<span class="hljs-type">|L3</span>)
          \   /                                    |
-          v v                                     v
-  L1A2A=H(<span class="hljs-string">'LnBranch'</span>,L1A|L2A)                    L3
+          <span class="hljs-type">v</span> v                                     v
+  L1A2A=H(<span class="hljs-string">"LnBranch"</span>,L1A|<span class="hljs-type">|L2A</span>)                   L3A=H(<span class="hljs-string">"LnBranch"</span>,L3nonce|<span class="hljs-type">|L3</span>)
 
-Assume L1A2A &gt; L3:
+Assume L1A2A &gt; L3A:
 
-  L1A2A=H(<span class="hljs-string">'LnBranch'</span>,L1A|L2A)          L3
+  L1A2A=H(<span class="hljs-string">"LnBranch"</span>,L1A|<span class="hljs-type">|L2A</span>)          L3A
                           \            /
                            v          v
-                Root=H(<span class="hljs-string">'LnBranch'</span>,L3|L1A2A)
+                Root=H(<span class="hljs-string">"LnBranch"</span>,L3A|<span class="hljs-type">|L1A2A</span>)
 
-Signature = SIG(<span class="hljs-string">'lightningoffersignature'</span>, Root, nodekey)
+Signature = SIG(<span class="hljs-string">"lightningoffersignature"</span>, Root, nodekey)
 </code></pre><h1 id="offers">Offers</h1>
 <p>Offers are a precursor to an invoice: readers will either request an invoice
 (or multiple) or send an invoice based on the offer.  An offer can be much longer-lived than a
@@ -223,30 +216,6 @@ also designed for compactness, to easily fit inside a QR code.</p>
 <li>[<code>tu64</code>:<code>max</code>]</li>
 </ul>
 </li>
-<li>type: 26 (<code>recurrence</code>)</li>
-<li>data:<ul>
-<li>[<code>byte</code>:<code>time_unit</code>]</li>
-<li>[<code>tu32</code>:<code>period</code>]</li>
-</ul>
-</li>
-<li>type: 64 (<code>recurrence_paywindow</code>)</li>
-<li>data:<ul>
-<li>[<code>u32</code>:<code>seconds_before</code>]</li>
-<li>[<code>byte</code>:<code>proportional_amount</code>]</li>
-<li>[<code>tu32</code>:<code>seconds_after</code>]</li>
-</ul>
-</li>
-<li>type: 66 (<code>recurrence_limit</code>)</li>
-<li>data:<ul>
-<li>[<code>tu32</code>:<code>max_period</code>]</li>
-</ul>
-</li>
-<li>type: 28 (<code>recurrence_base</code>)</li>
-<li>data:<ul>
-<li>[<code>byte</code>:<code>start_any_period</code>]</li>
-<li>[<code>tu64</code>:<code>basetime</code>]</li>
-</ul>
-</li>
 <li>type: 30 (<code>node_id</code>)</li>
 <li>data:<ul>
 <li>[<code>point32</code>:<code>node_id</code>]</li>
@@ -268,143 +237,13 @@ also designed for compactness, to easily fit inside a QR code.</p>
 <li><p>subtype: <code>blinded_path</code></p>
 </li>
 <li>data:<ul>
+<li>[<code>point</code>:<code>first_node_id</code>]</li>
 <li>[<code>point</code>:<code>blinding</code>]</li>
-<li>[<code>u16</code>:<code>num_hops</code>]</li>
+<li>[<code>byte</code>:<code>num_hops</code>]</li>
 <li>[<code>num_hops*onionmsg_path</code>:<code>path</code>]</li>
 </ul>
 </li>
 </ol>
-<h2 id="recurrence">Recurrence</h2>
-<p>Some offers are <em>periodic</em>, such as a subscription service or monthly
-dues, in that payment is expected to be repeated.  There are many
-different flavors of repetition, consider:</p>
-<ul>
-<li>Payments due on the first of every month, for 6 months.</li>
-<li>Payments due on every Monday, 1pm Pacific Standard Time.</li>
-<li>Payments due once a year:<ul>
-<li>which must be made on January 1st, or</li>
-<li>which are only valid if started January 1st 2021, or</li>
-<li>which if paid after January 1st you (over) pay the full rate first year, or</li>
-<li>which if paid after January 1st are paid pro-rata for the first year, or</li>
-<li>which repeat from whenever you made the first payment</li>
-</ul>
-</li>
-</ul>
-<p>Thus, each payment has:</p>
-<ol>
-<li>A <code>time_unit</code> defining 0 (seconds), 1 (days), 2 (months), 3 (years).</li>
-<li>A <code>period</code>, defining how often (in <code>time_unit</code>) it has to be paid.</li>
-<li>An optional <code>recurrence_limit</code> of total payments to be paid.</li>
-<li>An optional <code>recurrence_base</code>:<ul>
-<li><code>basetime</code>, defining when the first period starts
- in seconds since 1970-01-01 UTC.</li>
-<li><code>start_any_period</code> if non-zero, meaning you don&#39;t have to start
- paying at the period indicated by <code>basetime</code>, but can use
- <code>recurrence_start</code> to indicate what period you are starting at.</li>
-</ul>
-</li>
-<li>An optional <code>recurrence_paywindow</code>:<ul>
-<li><code>seconds_before</code>, defining how many seconds prior to the start of
- the period a payment will be accepted.</li>
-<li><code>proportional_amount</code>, if set indicating that a payment made during
- the period itself will be charged proportionally to the remaining time
- in the period (e.g. 150 seconds into a 1500 second period gives a 10%
- discount).</li>
-<li><code>seconds_after</code>, defining how many seconds after the start of the period
- a payment will be accepted.
-If this field is missing, payment will be accepted during the prior period and
-the paid-for period.</li>
-</ul>
-</li>
-</ol>
-<p>Note that the <code>absolute_expiry</code> field already covers the case where an offer
-is no longer valid after January 1st 2021.</p>
-<h2 id="offer-period-calculation">Offer Period Calculation</h2>
-<p>Each period has a zero-based index, and a start time and an end time.
-Because the periods can be in non-seconds units, the duration of a
-period can depend on when it starts.  The period with index N+1 begins
-immediately following the end of period with index N.</p>
-<ul>
-<li>if an offer contains <code>recurrence_base</code>:<ul>
-<li>the start of period #0 is <code>basetime</code> seconds since 1970-01-01 UTC.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>the start of period #0 is the time of issuance of the first
-<code>invoice</code> for this particular offer and <code>payer_key</code>.</li>
-</ul>
-</li>
-</ul>
-<p>To calculate the start of period #<code>N</code> for <code>N</code> &gt; 0:</p>
-<ul>
-<li>if <code>time_unit</code> is 0:<ul>
-<li>period <code>N</code> starts at period #0 start plus <code>period</code> multiplied by <code>N</code>,
-in seconds.</li>
-</ul>
-</li>
-<li>otherwise, if <code>time_unit</code> is 1:<ul>
-<li>calculate the offset in seconds within the day of period #0 start.</li>
-<li>add <code>period</code> multiplied by <code>N</code> days to get the day of the period start.</li>
-<li>add the offset in seconds to get the period end in seconds.</li>
-</ul>
-</li>
-<li>otherwise, if <code>time_unit</code> is 2:<ul>
-<li>calculate the offset in days within the month of period #0 start.</li>
-<li>calculate the offset in seconds within the day of period #0 start.</li>
-<li>add <code>period</code> multiplied by <code>N</code> months to get the month of the period start.</li>
-<li>add the offset days to get the day of the period start.<ul>
-<li>if the day is not within the month, use the last day within the month.</li>
-</ul>
-</li>
-<li>add the offset seconds to get the period start in seconds.</li>
-</ul>
-</li>
-<li>otherwise, if <code>time_unit</code> is 3:<ul>
-<li>calculate the offset in months within the year of period #0 start.</li>
-<li>calculate the offset in days within the month of period #0 start.</li>
-<li>calculate the offset in seconds within the day of period #0 start.</li>
-<li>add <code>period</code> multiplied by <code>N</code> years to get the year of the period start.</li>
-<li>add the offset months to get the month of the period start.</li>
-<li>add the offset days to get the day of the period start.<ul>
-<li>if the day is not within the month, use the last day within the month.</li>
-</ul>
-</li>
-<li>add the offset seconds to get the period start in seconds.</li>
-</ul>
-</li>
-<li>otherwise, the time is invalid.</li>
-</ul>
-<p>Note that offset seconds can overflow only if the period start is in a
-leap second; we ignore this!</p>
-<p>See <a href="bolt12/offer-period-test.json">offer-period-test.json</a>.</p>
-<h2 id="authorization">Authorization</h2>
-<p>Authorization is generally required for payments: without some
-indication what someone intended to pay for and how much they intended
-to pay, proof of payment is pointless.</p>
-<p>Normally this is simple: get the user to authorize the exact amount
-and description before paying an invoice.  With recurrence this
-becomes more complex, as an implementation probably does not want to
-prompt the user on every payment, but receive some initial
-authorization to spend within a range (e.g. &quot;Pay $5 AUD once a
-week?&quot;).  In particular, the authorization may be in the user&#39;s native
-currency, not the issuer&#39;s currency nor in Bitcoin.</p>
-<p>For example, consider an offer with weekly recurrence (<code>time_unit</code>=1,
-<code>period</code>=7), <code>amount</code> 500, <code>currency</code> <code>AUD</code> ($5 Australian dollars).
-An implementation may present this to the user as USD $3.53 (max
-$3.71), to allow up to 5% exchange slippage, and receive their
-authorization.  As it received each invoice, it would convert the
-<code>msat</code> into USD to check that it was below the maximum authorization
-of USD$3.71.  If it was, it would simply pay the invoice without user
-interaction.</p>
-<p>On the other hand, if an invoice did exceed the authorization, it
-would request re-authorization.  It could also indicate whether it was
-due to AUD/USD changes (since the offer indicated that was the
-currency it was using) or a disagreement on the bitcoin exchange rate.</p>
-<p>Note that the problem is simpler for non-recurring offers, where
-authorization may simply be delayed until the invoice is received and
-the exact amount is known.</p>
-<p>Also, the implementation of a trusted exchange rate service is left to
-the reader.</p>
 <h2 id="requirements-for-offers">Requirements For Offers</h2>
 <p>A writer of an offer:</p>
 <ul>
@@ -424,7 +263,7 @@ of the payment.</li>
 </ul>
 </li>
 <li>if a specific minimum <code>amount</code> is required for successful payment:<ul>
-<li>MUST specify <code>amount</code> to the amount expected (per item).</li>
+<li>MUST set <code>amount</code> to the amount expected (per item).</li>
 <li>if the currency for <code>amount</code> is that of the first entry in <code>chains</code>:<ul>
 <li>MUST specify <code>amount</code> in multiples of the minimum lightning-payable unit
 (e.g. milli-satoshis for bitcoin).</li>
@@ -490,73 +329,6 @@ publicly reachable nodes.</li>
 <li>MUST NOT set <code>quantity_min</code> or <code>quantity_max</code> less than 1.</li>
 </ul>
 </li>
-<li>MAY include <code>recurrence</code> to indicate offer should trigger time-spaced
-invoices.</li>
-<li>if it includes <code>recurrence</code>:<ul>
-<li>MUST set <code>time_unit</code> to 0 (seconds), 1 (days), 2 (months), 3 (years).</li>
-<li>MUST set <code>period</code> to how often (per <code>time-unit</code>) it wants to be paid.</li>
-<li>if there is a maximum number of payments:<ul>
-<li>MUST include <code>recurrence_limit</code> with <code>max_period</code> set to the maximum number of payments</li>
-<li>MUST NOT set <code>max_period</code> to 0.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT include <code>recurrence_limit</code>.</li>
-</ul>
-</li>
-<li>if periods are always at specific time offsets:<ul>
-<li>MUST include <code>recurrence_base</code></li>
-<li>MUST set <code>basetime</code> to the initial period time in number of
-seconds after midnight 1 January 1970</li>
-<li>if the first paid-for-period does not have to be the initial period:<ul>
-<li>MUST set <code>start_any_period</code> to 1.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST set <code>start_any_period</code> to 0.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT include <code>recurrence_base</code>.</li>
-</ul>
-</li>
-<li>if payments will be accepted for the current or next period:<ul>
-<li>MAY include <code>recurrence_paywindow</code></li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST include <code>recurrence_paywindow</code></li>
-</ul>
-</li>
-<li>if it includes <code>recurrence_paywindow</code>:<ul>
-<li>MUST set <code>seconds_before</code> to the maximum number of seconds prior to
-a period for which it will accept payment or invoice_request for that period.</li>
-<li>MUST set <code>seconds_after</code> to the maximum number of seconds into to a
-period for which it will accept payment or invoice_request for that period.</li>
-<li>MAY NOT enforce this for the initial period for offers without <code>recurrence_base</code></li>
-<li>SHOULD NOT set <code>seconds_after</code> to greater than the maximum number of
-seconds in a period.</li>
-<li>if it <code>amount</code> is specified and the node will proportionally reduce
-the amount charged for a period payed after the start of the period:<ul>
-<li>MUST set <code>proportional_amount</code> to 1 </li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST set <code>proportional_amount</code> to 0</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT include <code>recurrence_base</code>.</li>
-<li>MUST NOT include <code>recurrence_paywindow</code>.</li>
-<li>MUST NOT include <code>recurrence_limit</code>.</li>
-</ul>
-</li>
 <li>if <code>send_invoice</code> is present:<ul>
 <li>if the offer is for a partial or full refund for a previously-paid
 invoice:<ul>
@@ -602,9 +374,6 @@ invoice.</li>
 <li>FIXME: more!</li>
 </ul>
 <h2 id="rationale">Rationale</h2>
-<p>It&#39;s quite reasonable to set a <code>recurrence_paywindow</code> with seconds_after
-equal to 0, but obviously this should not apply to the initial period if
-there is no recurrence_base.</p>
 <p>A signature is optional, because it makes for a longer string (potentially
 limiting QR code use on low-end cameras); if the offer has an error, no
 invoice will be given (or, for <code>send_invoice</code> offers, accepted), since
@@ -616,9 +385,9 @@ invoices is <code>lnr</code>.</p>
 <ol>
 <li><code>tlv_stream</code>: <code>invoice_request</code></li>
 <li>types:<ol>
-<li>type: 2 (<code>chains</code>)</li>
+<li>type: 3 (<code>chain</code>)</li>
 <li>data:<ul>
-<li>[<code>...*chain_hash</code>:<code>chains</code>]</li>
+<li>[<code>chain_hash</code>:<code>chain</code>]</li>
 </ul>
 </li>
 <li>type: 4 (<code>offer_id</code>)</li>
@@ -639,16 +408,6 @@ invoices is <code>lnr</code>.</p>
 <li>type: 32 (<code>quantity</code>)</li>
 <li>data:<ul>
 <li>[<code>tu64</code>:<code>quantity</code>]</li>
-</ul>
-</li>
-<li>type: 36 (<code>recurrence_counter</code>)</li>
-<li>data:<ul>
-<li>[<code>tu32</code>:<code>counter</code>]</li>
-</ul>
-</li>
-<li>type: 68 (<code>recurrence_start</code>)</li>
-<li>data:<ul>
-<li>[<code>tu32</code>:<code>period_offset</code>]</li>
 </ul>
 </li>
 <li>type: 38 (<code>payer_key</code>)</li>
@@ -698,7 +457,7 @@ invoices is <code>lnr</code>.</p>
 </li>
 <li>if the offer did not specify <code>amount</code>:<ul>
 <li>MUST specify <code>amount</code>.<code>msat</code> in multiples of the minimum lightning-payable unit
-(e.g. milli-satoshis for bitcoin) for the first <code>chains</code> entry.</li>
+(e.g. milli-satoshis for bitcoin) for <code>chain</code> (or for bitcoin, if there is no <code>chain</code>).</li>
 </ul>
 </li>
 <li>otherwise:<ul>
@@ -715,66 +474,16 @@ invoices is <code>lnr</code>.</p>
 <li>MUST set <code>replace_invoice</code> to the <code>payment_hash</code> or the previous invoice.</li>
 </ul>
 </li>
-<li>if the offer contained <code>recurrence</code>:<ul>
-<li>for the initial request:<ul>
-<li>MUST use a unique <code>payer_key</code>.</li>
-<li>MUST set <code>recurrence_counter</code> <code>counter</code> to 0.</li>
-</ul>
-</li>
-<li>for any successive requests:<ul>
-<li>MUST use the same <code>payer_key</code> as the initial request.</li>
-<li>MUST set <code>recurrence_counter</code> <code>counter</code> to one greater than the highest-paid invoice.</li>
-</ul>
-</li>
-<li>if the offer contained <code>recurrence_base</code> with <code>start_any_period</code> non-zero:<ul>
-<li>MUST include <code>recurrence_start</code></li>
-<li>MUST set <code>period_offset</code> to the period the sender wants for the initial request</li>
-<li>MUST set <code>period_offset</code> to the same value on all following requests.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT include <code>recurrence_start</code></li>
-</ul>
-</li>
-<li>MAY set <code>payer_info</code> to arbitrary data to be reflected into the invoice.</li>
-<li>MAY set <code>payer_note</code> to arbitrary string to be reflected into the invoice.</li>
-<li>if the offer contained <code>recurrence_limit</code>:<ul>
-<li>MUST NOT send an <code>invoice_request</code> for a period greater than <code>max_period</code></li>
-</ul>
-</li>
-<li>SHOULD NOT send an <code>invoice_request</code> for a period which has
-already passed.</li>
-<li>if the offer contains <code>recurrence_paywindow</code>:<ul>
-<li>if the offer has a <code>recurrence_basetime</code> or the <code>recurrence_counter</code> is non-zero:<ul>
-<li>SHOULD NOT send an <code>invoice_request</code> for a period prior to <code>seconds_before</code> seconds before that period start.</li>
-<li>SHOULD NOT send an <code>invoice_request</code> for a period later than <code>seconds_after</code> seconds past that period start.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>SHOULD NOT send an <code>invoice_request</code> with <code>recurrence_counter</code>
-is non-zero for a period whose immediate predecessor has not
-yet begun.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT set <code>recurrence_counter</code>.</li>
-<li>MUST NOT set <code>recurrence_start</code></li>
-</ul>
-</li>
 </ul>
 <p>The reader of an invoice_request:</p>
 <ul>
 <li>MUST fail the request if <code>payer_key</code> is not present.</li>
-<li>if <code>chains</code> is not present:<ul>
+<li>if <code>chain</code> is not present:<ul>
 <li>MUST fail the request if bitcoin is not a supported chain.</li>
 </ul>
 </li>
 <li>otherwise:<ul>
-<li>MUST fail the request if <code>chains</code> does not include a supported chain.</li>
+<li>MUST fail the request if <code>chain</code> is not a supported chain.</li>
 </ul>
 </li>
 <li>MUST fail the request if <code>features</code> contains unknown even bits.</li>
@@ -808,7 +517,7 @@ invoice currency.</li>
 </li>
 <li>otherwise:<ul>
 <li>MUST fail the request if it does not contain <code>amount</code>.</li>
-<li>MUST use the request <code>amount</code> as the <em>base invoice amount</em>. (Note: invoice amount can be further modified by recurrence below)</li>
+<li>MUST use the request <code>amount</code> as the <em>base invoice amount</em>.</li>
 </ul>
 </li>
 <li>if the offer has a <code>replace_invoice</code>:<ul>
@@ -822,70 +531,8 @@ invoice currency.</li>
 </li>
 </ul>
 </li>
-<li>if the offer had a <code>recurrence</code>:<ul>
-<li>MUST fail the request if there is no <code>recurrence_counter</code> field.</li>
-<li>if the offer had <code>recurrence_base</code> and <code>start_any_period</code> was 1:<ul>
-<li>MUST fail the request if there is no <code>recurrence_start</code> field.</li>
-<li>MUST consider the period index for this request to be the
-<code>recurrence_start</code> field plus the <code>recurrence_counter</code> <code>counter</code>
-field.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST fail the request if there is a <code>recurrence_start</code> field.</li>
-<li>MUST consider the period index for this request to be the
-<code>recurrence_counter</code> <code>counter</code> field.</li>
-</ul>
-</li>
-<li>if the offer has a <code>recurrence_limit</code>:<ul>
-<li>MUST fail the request if the period index is greater than <code>max_period</code>.</li>
-</ul>
-</li>
-<li>MUST calculate the period using the period index as detailed in <a href="#offer-period-calculation">Period Calculation</a>.</li>
-<li>if <code>recurrence_counter</code> is non-zero:<ul>
-<li>MUST fail the request if the no invoice for the previous period
-has been paid.</li>
-<li>if the offer had a <code>recurrence_paywindow</code>:<ul>
-<li>SHOULD fail the request if the current time is before the start of
-the period minus <code>seconds_before</code>.</li>
-<li>SHOULD fail the request if the current time is equal to or after the
-start of the period plus <code>seconds_after</code>.</li>
-<li>if <code>proportional_amount</code> is 1:<ul>
-<li>MUST adjust the <em>base invoice amount</em> proportional to time remaining in
-the period.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>if <code>counter</code> is non-zero:<ul>
-<li>SHOULD fail the request if the current time is prior to the start
-of the previous period.</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise (the offer had no <code>recurrence</code>):<ul>
-<li>MUST fail the request if there is a <code>recurrence_counter</code> field.</li>
-<li>MUST fail the request if there is a <code>recurrence_start</code> field.</li>
-</ul>
-</li>
 </ul>
 <h2 id="rationale">Rationale</h2>
-<p>We insist that recurring requests be in order (thus, if you pay an
-invoice for #34 of a recurring offer, it implicitly commits to the
-successful payment of #0 through #33).</p>
-<p>The <code>recurrence_paywindow</code> constrains how far you can pay in advance
-precisely, and if it isn&#39;t in the offer the defaults provide some
-slack, without allowing commitments into the far future.</p>
-<p>To avoid probing (should a payer_key become public in some way), we
-require a signature; this ensures that no third party can determine
-how many invoices have been paid already in the case of recurring
-requests, and disallows replacement of old invoices by third parties.</p>
 <p><code>payer_info</code> might typically contain information about the derivation of the
 <code>payer_key</code>.  This should not leak any information (such as using a simple
 BIP-32 derivation path); a valid system might be for a node to maintain a base
@@ -907,7 +554,7 @@ successful in replacing the stuck invoice, the sender may make a
 second payment such that it can prove double-payment should the
 receiver still accept the first, delayed payment.</p>
 <h1 id="invoices">Invoices</h1>
-<p>Invoices are a request for payment, and when the payment is made they
+<p>Invoices are a request for payment, and when the payment is made 
 it can be combined with the invoice to form a cryptographic receipt.</p>
 <p>The human-readable prefix for invoices is <code>lni</code>.  It can be sent in
 response to an <code>invoice_request</code> or an <code>offer</code> with <code>send_invoice</code>
@@ -916,9 +563,9 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 <li><code>tlv_stream</code>: <code>invoice</code></li>
 <li><p>types:</p>
 <ol>
-<li>type: 2 (<code>chains</code>)</li>
+<li>type: 3 (<code>chain</code>)</li>
 <li>data:<ul>
-<li>[<code>...*chain_hash</code>:<code>chains</code>]</li>
+<li>[<code>chain_hash</code>:<code>chain</code>]</li>
 </ul>
 </li>
 <li>type: 4 (<code>offer_id</code>)</li>
@@ -974,22 +621,6 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 <li>type: 34 (<code>refund_for</code>)</li>
 <li>data:<ul>
 <li>[<code>sha256</code>:<code>refunded_payment_hash</code>]</li>
-</ul>
-</li>
-<li>type: 36 (<code>recurrence_counter</code>)</li>
-<li>data:<ul>
-<li>[<code>tu32</code>:<code>counter</code>]</li>
-</ul>
-</li>
-<li>type: 54 (<code>send_invoice</code>)</li>
-<li>type: 68 (<code>recurrence_start</code>)</li>
-<li>data:<ul>
-<li>[<code>tu32</code>:<code>period_offset</code>]</li>
-</ul>
-</li>
-<li>type: 64 (<code>recurrence_basetime</code>)</li>
-<li>data:<ul>
-<li>[<code>tu64</code>:<code>basetime</code>]</li>
 </ul>
 </li>
 <li>type: 38 (<code>payer_key</code>)</li>
@@ -1083,8 +714,8 @@ January 1970, UTC when the offer was created.</li>
 <li>MUST set <code>sig</code> to the signature using <code>node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
 </ul>
 </li>
-<li>if the chain for the invoice is not solely bitcoin:<ul>
-<li>MUST specify <code>chains</code> the invoice is valid for.</li>
+<li>if the chain for the invoice is not bitcoin:<ul>
+<li>MUST specify <code>chain</code> the invoice is valid for.</li>
 </ul>
 </li>
 <li>otherwise:<ul>
@@ -1093,19 +724,6 @@ January 1970, UTC when the offer was created.</li>
 </li>
 <li>if it has bolt11 features:<ul>
 <li>MUST set <code>features</code> to the bitmap of features.</li>
-</ul>
-</li>
-<li>if the invoice corresponds to an offer with <code>recurrence</code>:<ul>
-<li>MUST set <code>recurrence_basetime</code> to the start of period #0 as calculated
-by <a href="#offer-period-calculation">Period Calculation</a>.</li>
-<li>if it sets <code>relative_expiry</code>:<ul>
-<li>MUST NOT set <code>relative_expiry</code> <code>seconds_from_creation</code> more than the number of seconds after <code>created_at</code> that payment for this period will be accepted.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST not set <code>recurrence_basetime</code>.</li>
 </ul>
 </li>
 <li>if the expiry for accepting payment is not 7200 seconds after <code>created_at</code>:<ul>
@@ -1140,7 +758,7 @@ it has a preference.</li>
 <li>MUST include <code>blindedpay</code> with exactly one <code>payinfo</code> for
 each <code>onionmsg_path</code> in <code>blinded_path</code>, in order.</li>
 <li>if it includes <code>blinded_capacities</code>:<ul>
-<li>MUST include exactly one <code>incoming_msat</code> (in millisatoshis) per <code>path</code>, reflecting the expected minimum amount that can be sent through the path.</li>
+<li>MUST include exactly one <code>incoming_msat</code> (in millisatoshis) per <code>path</code>, reflecting the expected maximum amount that can be sent through the path.</li>
 </ul>
 </li>
 <li>SHOULD ignore any payment which does not use one of the paths.</li>
@@ -1151,9 +769,9 @@ each <code>onionmsg_path</code> in <code>blinded_path</code>, in order.</li>
 </ul>
 </li>
 <li>MUST specify <code>amount</code>.<code>msat</code> in multiples of the minimum lightning-payable unit
-(e.g. milli-satoshis for bitcoin) for the first <code>chains</code> entry.</li>
+(e.g. milli-satoshis for bitcoin) for <code>chain</code> (or for bitcoin, if there is no <code>chain</code>).</li>
 <li>if responding to an <code>invoice_request</code>:<ul>
-<li>if for the same <code>offer_id</code>, <code>payer_key</code> and <code>recurrence_counter</code> (if any) as a previous <code>invoice_request</code>:<ul>
+<li>if for the same <code>offer_id</code> and <code>payer_key</code> as a previous <code>invoice_request</code>:<ul>
 <li>MAY simply reuse the previous invoice.</li>
 </ul>
 </li>
@@ -1163,8 +781,6 @@ each <code>onionmsg_path</code> in <code>blinded_path</code>, in order.</li>
 </li>
 <li>MUST set <code>node_id</code> the same as the offer.</li>
 <li>MUST set (or not set) <code>quantity</code> exactly as the invoice_request did.</li>
-<li>MUST set (or not set) <code>recurrence_counter</code> exactly as the invoice_request did.</li>
-<li>MUST set (or not set) <code>recurrence_start</code> exactly as the invoice_request did.</li>
 <li>MUST set <code>payer_key</code> exactly as the invoice_request did.</li>
 <li>MUST set (or not set) <code>payer_info</code> exactly as the invoice_request did.</li>
 <li>MUST set (or not set) <code>payer_note</code> exactly as the invoice_request did,
@@ -1205,7 +821,6 @@ or MUST not set it.</li>
 <li>MUST NOT set <code>refund_signature</code></li>
 </ul>
 </li>
-<li>FIXME: recurrence!</li>
 </ul>
 </li>
 </ul>
@@ -1236,8 +851,6 @@ or MUST not set it.</li>
 <li>MUST reject the invoice unless the following fields are equal or unset
 exactly as they are in the <code>invoice_request:</code><ul>
 <li><code>quantity</code></li>
-<li><code>recurrence_counter</code></li>
-<li><code>recurrence_start</code></li>
 <li><code>payer_key</code></li>
 <li><code>payer_info</code></li>
 <li>MUST reject the invoice if <code>payer_note</code> is set, and was unset or not equal to the field in the <code>invoice_request</code>.</li>
@@ -1269,10 +882,6 @@ exactly as they are in the <code>offer</code>:<ul>
 </li>
 </ul>
 </li>
-<li>if the offer contained <code>recurrence</code>:<ul>
-<li>MUST reject the invoice if <code>recurrence_basetime</code> is not set.</li>
-</ul>
-</li>
 <li>if the offer contained <code>refund_for</code>:<ul>
 <li>MUST reject the invoice if <code>payer_key</code> does not match the invoice whose <code>payment_hash</code> is equal to <code>refund_for</code> <code>refunded_payment_hash</code></li>
 <li>MUST reject the invoice if <code>refund_signature</code> is not set.</li>
@@ -1285,19 +894,26 @@ exactly as they are in the <code>offer</code>:<ul>
 <li>MUST ignore any <code>fallback_address</code> for which <code>address</code> does not meet known requirements for the given <code>version</code></li>
 </ul>
 </li>
+<li>if the <code>min_final_cltv_expiry</code> is specified:<ul>
+<li>MUST use an expiry delta of at least that value when making the payment</li>
+</ul>
+</li>
+<li>otherwise: <ul>
+<li>MUST use an expiry delta of at least 18 when making the payment</li>
+</ul>
+</li>
 </ul>
 <h2 id="rationale">Rationale</h2>
 <p>Because the messaging layer is unreliable, it&#39;s quite possible to
 receive multiple requests for the same offer.  As it&#39;s the caller&#39;s
 responsibility not to reuse <code>payer_key</code> except for recurring invoices,
 the writer doesn&#39;t have to check all the fields are duplicates before
-simply returning a previous invoice.</p>
+simply returning a previous invoice.  Note that such caching is optional,
+and should be carefully limited when e.g. currency conversion is involved,
+or if the invoice has expired.</p>
 <p>The invoice duplicates fields rather than committing to the previous offer or
 invoice_request.  This flattened format simplifies storage at some space cost, as
 the payer need only remember the invoice for any refunds or proof.</p>
-<p>The <code>recurrence_basetime</code> similarly enables calculation of the next period
-without having to refer to the initial invoice (in the case where the
-offer does not contain <code>recurrence_base</code>.</p>
 <p>The reader of the invoice cannot trust the invoice correctly reflects the
 offer and invoice_request fields, hence the requirements to check that they
 are correct.</p>
@@ -1310,7 +926,7 @@ if that is a long time and the offer was in another currency, it&#39;s
 common to cap this at some maximum duration.  For example, omitting it
 implies the default of 7200 seconds, which is generally a sufficient
 time for payment.</p>
-<p>The invoice issuer is allows to ignore <code>payer_note</code> (it has an odd
+<p>The invoice issuer is allowed to ignore <code>payer_note</code> (it has an odd
 number, so is optional), but if it does not, it must copy it exactly
 as the invoice_request specified.</p>
 <p>It&#39;s often useful to provide capacity hints, particularly where more
@@ -1380,7 +996,7 @@ other means (i.e. transport-specific), but is still hashed for sig.</li>
 <li>We could upgrade to allow multiple offers in one invoice_request and
 invoice, to make a shopping list.</li>
 <li>All-zero offer_id == gratuitous payment.</li>
-<li>Recurrent invoice requests?</li>
+<li>Streaming invoices?</li>
 </ol>
 <p>[1] <a href="https://www.youtube.com/watch?v=4SYc_flMnMQ">https://www.youtube.com/watch?v=4SYc_flMnMQ</a></p>
 </body></html>
