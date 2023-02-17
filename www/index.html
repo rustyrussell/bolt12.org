@@ -1,183 +1,458 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>bolt12.org: Lightning's Native Experience, Everywhere</title>
-  </head>
-  <body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="BOLT⚡️12.org: Lightning's Native Experience, Everywhere">
+		<meta name="author" content="SuperAtic">
+		<meta name="generator" content="Hugo 0.108.0">
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+		<title>BOLT⚡️12.org: Lightning's Native Experience, Everywhere</title>
+		<style>
+			small a {color: #c8c8c8;}
+			small a:hover {color: #a0a0a0;}
+			small a, nav a {
+			text-decoration: none;
+			}
+			a {color: #ff9500;}
+			.bd-placeholder-img {
+			font-size: 1.125rem;
+			text-anchor: middle;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+			}
+			@media (min-width: 768px) {
+			.bd-placeholder-img-lg {
+			font-size: 3.5rem;
+			}
+			}
+			.b-example-divider {
+			height: 3rem;
+			background-color: rgba(0, 0, 0, .1);
+			border: solid rgba(0, 0, 0, .15);
+			border-width: 1px 0;
+			box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+			}
+			.b-example-vr {
+			flex-shrink: 0;
+			width: 1.5rem;
+			height: 100vh;
+			}
+			.bi {
+			vertical-align: -.125em;
+			fill: currentColor;
+			}
+			.nav-scroller {
+			position: relative;
+			z-index: 2;
+			height: 2.75rem;
+			overflow-y: hidden;
+			}
+			.nav-scroller .nav {
+			display: flex;
+			flex-wrap: nowrap;
+			padding-bottom: 1rem;
+			margin-top: -1px;
+			overflow-x: auto;
+			text-align: center;
+			white-space: nowrap;
+			-webkit-overflow-scrolling: touch;
+			}
+			.container {
+			max-width: 960px;
+			}
+			/*
+			* Custom translucent site header
+			*/
+			.site-header {
+			background-color: rgba(0, 0, 0, .85);
+			-webkit-backdrop-filter: saturate(180%) blur(20px);
+			backdrop-filter: saturate(180%) blur(20px);
+			}
+			.site-header a {
+			color: #8e8e8e;
+			transition: color .15s ease-in-out;
+			}
+			.site-header a:hover {
+			color: #fff;
+			text-decoration: none;
+			}
+			/*
+			* Extra utilities
+			*/
+			.flex-equal > * {
+			flex: 1;
+			}
+			@media (min-width: 768px) {
+			.flex-md-equal > * {
+			flex: 1;
+			}
+			}
+		</style>
+		<!-- Custom styles for this template -->
+		<link href="product.css" rel="stylesheet">
+	</head>
+	<body>
+		<header class="site-header sticky-top py-1">
+			<nav class="container d-flex flex-column flex-md-row justify-content-between">
+				<a class="py-2" href="#" aria-label="BOLT⚡️12.org"><strong>BOLT</strong>⚡️12</a>
+				<a class="py-2 d-none d-md-inline-block" href="#how" >How</a>
+				<a class="py-2 d-none d-md-inline-block" href="#dep" >Deployment</a>
+				<a class="py-2 d-none d-md-inline-block" href="#tec" >Technology</a>
+				<a class="py-2 d-none d-md-inline-block" href="#exa" >Examples</a>
+				<a class="py-2 d-none d-md-inline-block" href="#who" >Who</a>
+				<a class="py-2 d-none d-md-inline-block" href="#dev" >Dev</a>
+				<!--a class="py-2 d-none d-md-inline-blockk" href="https://twitter.com/rusty_twit" target="_blank" rel="noopener">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="navbar-nav-svg" viewBox="0 0 512 416.32" role="img"><title>Twitter</title><path fill="currentColor" d="M160.83 416.32c193.2 0 298.92-160.22 298.92-298.92 0-4.51 0-9-.2-13.52A214 214 0 0 0 512 49.38a212.93 212.93 0 0 1-60.44 16.6 105.7 105.7 0 0 0 46.3-58.19 209 209 0 0 1-66.79 25.37 105.09 105.09 0 0 0-181.73 71.91 116.12 116.12 0 0 0 2.66 24c-87.28-4.3-164.73-46.3-216.56-109.82A105.48 105.48 0 0 0 68 159.6a106.27 106.27 0 0 1-47.53-13.11v1.43a105.28 105.28 0 0 0 84.21 103.06 105.67 105.67 0 0 1-47.33 1.84 105.06 105.06 0 0 0 98.14 72.94A210.72 210.72 0 0 1 25 370.84a202.17 202.17 0 0 1-25-1.43 298.85 298.85 0 0 0 160.83 46.92"></path></svg>
+					<small class="d-lg-none ms-2">Twitter</small>
+					</a -->
+				<a class="py-2 d-none d-md-inline-block" href="https://github.com/rustyrussell/bolt12" target="_blank" rel="noopener">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="navbar-nav-svg" viewBox="0 0 512 499.36" role="img">
+						<title>GitHub</title>
+						<path fill="currentColor" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path>
+					</svg>
+					<small class="d-lg-none ms-2">GitHub</small>
+				</a>
+				<a class="py-2 d-none d-md-inline-block" href="https://t.me/bolt12org" target="_blank" rel="noopener">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" fill-rule="evenodd" class="navbar-nav-svg"  viewBox="0 0 496 512" role="img">
+						<title>Telegram</title>
+						<path fill="currentColor" d="M248,8C111.033,8,0,119.033,0,256S111.033,504,248,504,496,392.967,496,256,384.967,8,248,8ZM362.952,176.66c-3.732,39.215-19.881,134.378-28.1,178.3-3.476,18.584-10.322,24.816-16.948,25.425-14.4,1.326-25.338-9.517-39.287-18.661-21.827-14.308-34.158-23.215-55.346-37.177-24.485-16.135-8.612-25,5.342-39.5,3.652-3.793,67.107-61.51,68.335-66.746.153-.655.3-3.1-1.154-4.384s-3.59-.849-5.135-.5q-3.283.746-104.608,69.142-14.845,10.194-26.894,9.934c-8.855-.191-25.888-5.006-38.551-9.123-15.531-5.048-27.875-7.717-26.8-16.291q.84-6.7,18.45-13.7,108.446-47.248,144.628-62.3c68.872-28.647,83.183-33.623,92.511-33.789,2.052-.034,6.639.474,9.61,2.885a10.452,10.452,0,0,1,3.53,6.716A43.765,43.765,0,0,1,362.952,176.66Z"/>
+					</svg>
+					<small class="d-lg-none ms-2">Telegram</small>
+				</a>
+			</nav>
+		</header>
+		<main>
+			<div class="position-relative overflow-hidden p-3 text-center bg-light mb-2">
+				<div class="col-md-5 p-lg-5 my-5 mx-auto">
+					<h1 class="display-4 fw-normal">Offers</h2>
+</h1>
+					<p class="lead fw-normal">Lightning's Native Experience, Everywhere</p>
+					<p>Offers is a <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">draft specification</a> (called a "BOLT") for Lightning wallets and nodes, with experimental support already in <a href="https://github.com/ElementsProject/lightning/">c-lightning</a>. We host an HTML copy <a href="bolt12.html">of the latest text</a>.</p>
+					<a class="btn btn-outline-secondary" href="#">Coming soon</a>
+				</div>
+				<div class="shadow-sm d-none d-md-block"></div>
+				<div class="shadow-sm d-none d-md-block"></div>
+			</div>
+			<div class="row align-items-md-stretch p-4  text-center">
+				<div class="col-md-3">
+					<div class="h-100 p-5 bg-light border rounded-3">
+						<img src="bolt12.png" class="img-fluid" alt="BOLT12 Offer"><br/>
+						<small>BOLT12 Offer</small>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="h-100 p-5 text-bg-dark rounded-3">
+						<h3>You scan a QR code, your wallet prompts you to pay it</h3>
+						<p>just like BOLT11 invoices today (the QR code labelled BOLT11 Invoice). But it could also offer to send <b>you</b> money, like for a donation or a gift. And unlike the BOLT11 invoices, you can (and should!) reuse the BOLT12 offers: a static image on your web page, a QR code on your billboard.  The BOLT 12 offer can be used by as many people as want to: the BOLT 11 invoice can only be used once, <em>and is insecure if someone else tries to reuse it!</em>.
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="h-100 p-5 bg-light border rounded-3">
+						<img src="bolt11.png" class="img-fluid" alt="BOLT11 Invoice"><br/>
+						<small>BOLT11 Invoice</small>
+					</div>
+				</div>
+			</div>
+			<div id="how"></div>
+<div class="row">
+  <div class="col">
+					<div class="h-100 p-5 bg-light border rounded-3">
+				<h2>How It Works <small><a href="#how">#</a></small></h2>
+					<p class="lead">
+						An "offer" has enough information for you to reach out and fetch a real invoice from the vendor, <em>through the Lightning Network itself</em>, just like it would send a payment: no web server needed. Your wallet then pays the actual invoice (or, for a "send invoice" offer, your wallet sends an invoice which the vendor pays, as an ATM or refund would use).
+					</p>
+					<p>
+						This means that offers can be <b>much smaller</b> than invoices, and contain more information (currency, vendor name, quantity limits, blinded paths to reach the vendor).
+					</p>
+					<p>
+						<b style="font-size:123%;">DO NOT GET AN OFFER TATTOO UNTIL SPEC IS FULLY RATIFIED!</b>
+					</p>
+				</div>
+	  
+  </div>
+  <div class="col">
+	  			<div id="dep"></div>
 
-    <div class="container" style="margin-bottom: 100px;">
-      <h1 style="text-align:center">Offers: Lightning's Native Experience, Everywhere</h1>
+					<div class="h-100 p-5 bg-light border rounded-3">
+				<h2>Deployment <small><a href="#dep">#</a></small></h2>
+					<p>
+						The draft was first posted September 2020, and revised heavily since. It was first implemented in <a href="https://github.com/ElementsProject/lightning/releases/v0.9.3">c-lightning v0.9.3</a> released in January 2021, but since increased feedback and implementations come on board, <b>it could change again</b>.
+					</p>
+					<p>
+						<a href="https://github.com/lightningnetwork/lightning-rfc/pull/759">Onion messages</a> are still in draft, too, though simple to implement: the current c-lightning implementation opens a direct connection to send onion messages if it needs to (bad for privacy unless you're using Tor!).
+					</p>
+					<p>
+						There's a REST API to decode offers, request invoices, and decode the invoices at <a href="https://bootstrap.bolt12.org">bootstrap.bolt12.org</a>; this includes extensive <a href="#exa">examples</a> for usage.  Obviously using this API exposes your information, but it makes wallet support trivial.
+					</p>
+				</div>
 
-      <p>
-	Offers is
-	a <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">draft
-	  specification</a> (called a "BOLT") for Lightning wallets and nodes, with
-	experimental support already in <a href="https://github.com/ElementsProject/lightning/">c-lightning</a>.
-      </p>
-      <p>
-	We host an HTML copy <a href="bolt12.html">of the latest text</a>.
-      </p>
+  </div>
+</div>
 
-      <h2>Experience</h2>
+			<div id="tec"></div>
+			<div class="row align-items-md-stretch p-4 mt-5 text-center">
+				<h2>Technology <small><a href="#tec">#</a></small></h2>
+				<p class="lead">
+					Offers are defined in the draft specification as BOLT12 (vs BOLT11 which defines invoices today); you can review the draft <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">on GitHub</a>
+				</p>
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Onion Messages</h3>
+								<p>
+									Using the same onion mechanism we use to send payments, without the actual payment part. You can (and people do!) use fake payments to send messages today, but it's 3x slower and consumes far more resources on each hop.
+								</p>
+							</div>
+						</div>
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Blinded Paths</h3>
+								<p>
+									This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the vendor, if they want to.
+								</p>
+							</div>
+						</div>
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Schnorr Signatures</h3>
+								<p>
+									BOLT 12 uses Schnorr signatures throughout, which make implementing multisig Lightning nodes transparently possible in future.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">BIP 340</h3>
+								<p>
+									BOLT 12 uses x-only public keys (trivially backwards compatible for current nodes which use SEC-1 encoded compressed keys) which are slightly shorter, and uses the same signature scheme as Taproot.
+								</p>
+							</div>
+						</div>
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Payer proofs</h3>
+								<p>
+									Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the vendor can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
+								</p>
+							</div>
+						</div>
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Merkle Trees</h3>
+								<p>
+									Offers are technically a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Wire protocol</h3>
+								<p>
+									Offers, invoice requests and invoices are encoded using the exact same protocol as the Lightning Network uses today, just represented using the QR-code friendly bech32 character set.
+								</p>
+							</div>
+						</div>
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Extensible</h3>
+								<p>
+									By using the compatibility schemes already used by the Lightning Network (feature bits, new fields) it's easy to expand for new uses in the future.  There are already a few extension proposals!
+								</p>
+							</div>
+						</div>
+						<div class="col-sm card m-3">
+							<div class="card-body">
+								<h3 class="card-title">Native</h3>
+								<p>
+									By using the Lightning Network to send messages, there's no need to run a web server or even deal with that: your lightning node does all the work of serving invoices for offers, and taking the money.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="exa"></div>
+			<div class="row align-items-md-stretch p-4 mt-5 mb-5">
+				<div class=" text-center bb-3">
+				<h2>Practical Examples <small><a href="#exa">#</a></small></h2>
+				<p  class="lead">
+					You can refer to the detailed documentation on the <a href="https://bootstrap.bolt12.org/examples">BOLT12 API page</a>.
+				</p>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3>One time Donation</h3>
+						<p>The simplest non-recurring possible offer without specified amount. <br/>Created by command: <code>lightning-cli offer any "Offer by rusty's node"</code></p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pqqnyzsmx5cx6umpwssx6atvw35j6ut4v9h8g6t50ysx7enxv4epgrmjw4ehgcm0wfczucm0d5hxzagkqyq3ugztng063cqx783exlm97ekyprnd4rsu5u5w5sez9fecrhcuc3ykq5.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3>Crowdfunding Packages</h3>
+						<p>An offer with a fixed amount (technically a minimum: you can tip), with a quantity so you can order more than one. It also has a vendor field.
+							<br/>Created by command: <code>lightning-cli offer amount=50 description="50msat multi-quantity offer" vendor="rustcorp.com.au" quantity_min=1</code>
+						</p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3>Membership Access</h3>
+						<p>Simple offer asks for 100msat every minute: <br/>Created by command: <code>lightning-cli offer amount=100msat description="100msat every minute" vendor="rusty.ozlabs.org" recurrence=1minute</code></p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pqqkgz38xycrqmtnv96zqetkv4e8jgrdd9h82ar99ss82upqw3hjqargwfjk2gr5d9kk2uc5zpe82um50yhx77nvv938xtn0wfn35qsq8s0zqju6r75wqph3uwfh7e0kd3qgumdgu8989r4yxg32wwqa78xyf9s9ggqsy.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3>Service Repayment</h3>
+						<p>Offer asks for 100msat every minute, but only three times:
+							<br/>Created by command: <code>lightning-cli offer amount=100msat description="100msat every minute, up to three times" vendor="rusty.ozlabs.org" recurrence=1minute recurrence_limit=2</code>
+						</p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pqqkgz3zxycrqmtnv96zqetkv4e8jgryv9ujcgrxwfhk6gp3949xzm3dxgcryvg5zpe82um50yhx77nvv938xtn0wfn35qspqywq2q2laenqq83qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3> Recurring Offer</h3>
+						<p>Offer asks for 100msat every day, first period being 1 Jan 2021 (you can start at any period though). <br/>Created by command: <code>lightning-cli offer amount=100msat description="100msat every day, from 1-Jan-2021" vendor="rusty.ozlabs.org" recurrence=1day recurrence_base=$(date +%s -d 2021-01-01)
+							</code> <br> 
+						<div class="alert alert-light" role="alert"><small>You need to calculate the current period, which depends on the current time (UTC). I ran echo $(( ( $(date +%s) - $(date +%s -d 2021-01-01) ) / 3600 / 24 )) and it told me it was day 183 (it's 2021-07-03), so I can request invoices for 183 or 184 (default paywindow is that you can pay the current or nex period). It's currently 777 days, so you can fetch your first invoice, using that super-secret payerkey of 010101...01:</small></div>
+						</p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pqpq86q2fgcnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qcteyqcksu3qvfjkvmmjv5s8gmeqxcczqum9vdhkuernypkxzar9zsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqxqqqquyqq8s.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3> Recurring Offer + Deadline</h3>
+						<p>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you can pay 1 hour early, or up to 60 seconds into the period. <br/>Created by command: <code>lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pay 1hr before to 60 seconds late" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-3600+60</code></p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-2">
+						<img src="https://bootstrap.bolt12.org/qrcode/lno1pqpq86q2xycnqvpsd4ekzapqv4mx2uneyqcnqgryv9uhxtpqveex7mfqxyk55ctw95erqv339ss8qun094exzarpzsg8yatnw3ujumm6d3skyuewdaexwxszqy9pcpgptlhxvqq7yp9e58aguqr0rcun0ajlvmzq3ek63cw2w282gv3z5uupmuwvgjtq2sqgqqxj7qqpp5hsq.png" class="img-fluid" atl="">
+					</div>
+					<div class="col-md-10">
+						<h3> Morgage Repayment</h3>
+						<p>Offer asks for up to 1000msat every 10 days, first period being 1 Jan 2021 (you can start at any period though), but you pay a percentage of the 10 days remaining (you can pay up to 10 days before). <br/>Created by command: <code>lightning-cli offer amount=1000msat description="1000msat every 10 days, from 1-Jan-2021, pro-rata" vendor="rusty.ozlabs.org" recurrence=10days recurrence_base=$(date +%s -d 2021-01-01) recurrence_paywindow=-864000+864000%</code></p>
 
-      <div class="row">
-	<div class="col-sm-2" style="text-align: center">
-	  <img src="lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs.png" class="img-fluid">
-	  BOLT12 Offer
-	</div>
-	<div class="col">
-	<p>
-	  You scan a QR code, your wallet prompts you to pay it, just like BOLT11 invoices today (the QR code labelled BOLT11 Invoice).
-	</p>
+						<button type="button" class="btn btn-outline-danger btn-sm">Signed</button>
+						<button type="button" class="btn btn-outline-warning btn-sm">Unsigned</button>
+						<button type="button" class="btn btn-outline-success btn-sm">Fetch</button>
+					</div>
+				</div>
 
-	<p>
-	  But it could also offer to send <b>you</b> money, like for an ATM.
-	</p>
-
-	<p>
-	  And unlike invoices, you can (and should!) reuse them: a static image on your web page, a QR code on your billboard.  The BOLT 12 offer can be used by as many people as want to: the BOLT 11 invoice can only be used once, <em>and is insecure if someone else tries to reuse it!</em>
-	</p>
-	</div>
-	<div class="col-sm-2" style="text-align: center">
-	  <img src="bolt11.png" class="img-fluid">
-	  BOLT11 Invoice
-	</div>
-      </div>
-      
-      <h2>How It Works</h2>
-
-      <p>
-	An "offer" has enough information for you to reach out and fetch a real invoice from the vendor, <em>through the Lightning Network itself</em>, just like it would send a payment: no web server needed. Your wallet then pays the actual invoice (or, for a "send invoice" offer, your wallet sends an invoice which the vendor pays, as an ATM or refund would use).
-      </p>
-
-      <p>
-	This means that offers can be <b>much smaller</b> than invoices, and contain more information (currency, vendor name, quantity limits, blinded paths to reach the vendor).
-      </p>
-
-      <h2>Who</h2>
-
-      <p>
-	I am <a href="https://rusty.ozlabs.org">Rusty Russell</a>, lead developer of c-lightning for <a href="https://blockstream.com">Blockstream</a>, which was the first implementation of the lightning network, and was the original chair of the <a href="https://github.com/lightningnetwork/lightning-rfc">Lightning Specification</a> process.  I also wrote the BOLT11 specification which defines lightning invoices used today, and so am very familiar with its limitations as the Lightning Network becomes ever more sophisticated.
-      </p>
-
-      <h2>Deployment</h2>
-
-      <p>
-	The draft was first posted September 2020, and revised heavily since. It was first implemented in <a href="https://github.com/ElementsProject/lightning/releases/v0.9.3">c-lightning v0.9.3</a> released in January 2021, but since increased feedback and implementations come on board, <b>it could change again</b>.
-      </p>
-
-      <p style="text-align:center">
-	<b style="font-size:150%;">DO NOT GET AN OFFER TATTOO UNTIL SPEC IS FULLY RATIFIED!</b>
-      </p>
-
-      <p>
-	<a href="https://github.com/lightningnetwork/lightning-rfc/pull/759">Onion messages</a> are still in draft, too, though simple to implement: the current c-lightning implementation opens a direct connection to send onion messages if it needs to (bad for privacy unless you're using Tor!).
-      </p>
-
-      <p>
-	There's a REST API to decode offers, request invoices, and decode the invoices at <a href="https://bootstrap.bolt12.org">bootstrap.bolt12.org</a>; this includes extensive <a href="https://bootstrap.bolt12.org/examples">examples</a> for usage.  Obviously using this API exposes your information, but it makes wallet support trivial.
-      </p>
-
-      <h2>Technology</h2>
-
-      <p>
-	Offers are defined in the draft specification as BOLT12 (vs BOLT11 which defines invoices today); you can review the draft <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">on GitHub</a>
-      </p> 
-
-     <div class="container-fluid">
-	<div class="row">
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Onion Messages</h3>
-			<p>
-			  Using the same onion mechanism we use to send payments, without the actual payment part. You can (and people do!) use fake payments to send messages today, but it's 3x slower and consumes far more resources on each hop.
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Blinded Paths</h3>
-			<p>
-			  This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the vendor, if they want to.
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Schnorr Signatures</h3>
-			<p>
-			  BOLT 12 uses Schnorr signatures throughout, which make implementing multisig Lightning nodes transparently possible in future.
-			</p>
-		</div>
-	  </div>
-	</div>
-	<div class="row">
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">BIP 340</h3>
-			<p>
-			  BOLT 12 uses x-only public keys (trivially backwards compatible for current nodes which use SEC-1 encoded compressed keys) which are slightly shorter, and uses the same signature scheme as Taproot.
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Payer proofs</h3>
-			<p>
-			  Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the vendor can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Merkle Trees</h3>
-			<p>
-			  Offers are technically a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
-			</p>
-		</div>
-	  </div>
-	</div>
-	<div class="row">
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Wire protocol</h3>
-			<p>
-			  Offers, invoice requests and invoices are encoded using the exact same protocol as the Lightning Network uses today, just represented using the QR-code friendly bech32 character set.
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-			<h3 class="card-title">Extensible</h3>
-			<p>
-			  By using the compatibility schemes already used by the Lightning Network (feature bits, new fields) it's easy to expand for new uses in the future.  There are already a few extension proposals!
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
-		  <h3 class="card-title">Native</h3>
-			<p>
-			  By using the Lightning Network to send messages, there's no need to run a web server or even deal with that: your lightning node does all the work of serving invoices for offers, and taking the money.
-			</p>
-		</div>
-	  </div>
-	</div>
-      </div>
-
-      <h2>Examples</h2>
-      <p>
-	You can see some simple examples on the <a href="https://bootstrap.bolt12.org/examples">BOLT12 API Examples page</a>.
-      </p>
-
-      <h2>Developing Offers</h2>
-      <p>
-	There are various people working on libraries and integration of offers: you can reach us on our <a href="https://t.me/bolt12org">Telegram channel</a>.
-      </p>
-    </div>
-  </body>
+				<div id="who"></div>
+				<div  class="row align-items-md-stretch p-4 mt-5 text-center">
+					<div class="col-md-6">
+					<div class="h-100 p-5 bg-light border rounded-3">
+						<h2>Who <small><a href="#who">#</a></small></h2>
+					<p>
+							I am <a href="https://rusty.ozlabs.org">Rusty Russell</a>, lead developer of c-lightning for <a href="https://blockstream.com">Blockstream</a>, which was the first implementation of the lightning network, and was the original chair of the <a href="https://github.com/lightningnetwork/lightning-rfc">Lightning Specification</a> process.  I also wrote the BOLT11 specification which defines lightning invoices used today, and so am very familiar with its limitations as the Lightning Network becomes ever more sophisticated.
+						</p>
+					</div>
+					</div>
+					<div class="col-md-6">
+				<div id="dev"></div>
+					<div class="h-100 p-5 bg-light border rounded-3">
+					<h2>Developing Offers <small><a href="#dev">#</a></small></h2>
+						<p class="lead">
+							There are various people working on libraries and integration of offers: you can reach us on our <a href="https://t.me/bolt12org">Telegram channel</a>.
+						</p>
+					</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="container py-5">
+			<div class="row">
+				<div class="col-12 col-md">
+					<span><strong>BOLT</strong>⚡️12</span>
+					<small class="d-block mb-3 text-muted">&copy; 2021–2023</small>
+				</div>
+				<div class="col-6 col-md">
+					<h5>Various</h5>
+					<ul class="list-unstyled text-small">
+						<li><a class="link-secondary" href="#">Enhanced Experience</a></li>
+						<li><a class="link-secondary" href="#how">How it Works</a></li>
+						<li><a class="link-secondary" href="#dep">Deployment</a></li>
+						<li><a class="link-secondary" href="#dev">Development</a></li>
+					</ul>
+				</div>
+				<div class="col-6 col-md">
+					<h5>Technology</h5>
+					<ul class="list-unstyled text-small">
+						<li><a class="link-secondary" href="#">Onion Messages</a></li>
+						<li><a class="link-secondary" href="#">Blinded Paths</a></li>
+						<li><a class="link-secondary" href="#">Schnorr Signatures</a></li>
+						<li><a class="link-secondary" href="#">BIP 340</a></li>
+						<li><a class="link-secondary" href="#">Payer proofs</a></li>
+						<li><a class="link-secondary" href="#">Merkle Trees</a></li>
+						<li><a class="link-secondary" href="#">Wire protocol</a></li>
+						<li><a class="link-secondary" href="#">Extensible</a></li>
+						<li><a class="link-secondary" href="#">Native</a></li>
+					</ul>
+				</div>
+				<div class="col-6 col-md">
+					<h5>Examples</h5>
+					<ul class="list-unstyled text-small">
+						<li><a class="link-secondary" href="#exa">One time Donation</a></li>
+						<li><a class="link-secondary" href="#exa">Crowdfunding Packages</a></li>
+						<li><a class="link-secondary" href="#exa">Membership Access</a></li>
+						<li><a class="link-secondary" href="#exa">Service Repayment</a></li>
+						<li><a class="link-secondary" href="#exa">Recurring Offer</a></li>
+						<li><a class="link-secondary" href="#exa">Recurring Offer + Deadline</a></li>
+						<li><a class="link-secondary" href="#exa">Mortgage Repayment</a></li>
+					</ul>
+				</div>
+				<div class="col-6 col-md">
+					<h5>Who</h5>
+					<ul class="list-unstyled text-small">
+						<li><a class="link-secondary" href="https://rusty.ozlabs.org/" target="_blank">Rusty</a></li>
+						<li><a class="link-secondary" href="https://twitter.com/rusty_twit" target="_blank">Twitter</a></li>
+						<li><a class="link-secondary" href="https://t.me/bolt12org" target="_blank">Telegram</a></li>
+						<li><a class="link-secondary" href="https://github.com/rustyrussell/bolt12" target="_blank">GitHub</a></li>
+					</ul>
+				</div>
+			</div>
+		</footer>
+	</body>
 </html>
