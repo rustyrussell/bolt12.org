@@ -1,5 +1,5 @@
 <html>
-  <head><title>BOLT #12: Revision 2c0bcfe2c5ceffeeecb928ee322d3dd3099cd195</title>
+  <head><title>BOLT #12: Revision 836069516148132c0e4d571489b8b18f044292e4</title>
   </head>
   <body>
     <!-- Thanks to https://markdowntohtml.com/ for the conversion! -->
@@ -9,14 +9,14 @@
 <li><a href="#limitations-of-bolt-11">Limitations of BOLT 11</a></li>
 <li><a href="#payment-flow-scenarios">Payment Flow Scenarios</a></li>
 <li><a href="#encoding">Encoding</a></li>
-<li><a href="#tlv-fields">TLV Fields</a></li>
-<li><a href="#invoices">Invoices</a></li>
+<li><a href="#signature-calculation">Signature calculation</a></li>
 <li><a href="#offers">Offers</a></li>
 <li><a href="#invoice-requests">Invoice Requests</a></li>
+<li><a href="#invoices">Invoices</a></li>
 <li><a href="#invoice-errors">Invoice Errors</a></li>
 </ul>
 <h1 id="limitations-of-bolt-11">Limitations of BOLT 11</h1>
-<p>The BOLT 11 invoice format has proven popular, but has several
+<p>The BOLT 11 invoice format has proven popular but has several
 limitations:</p>
 <ol>
 <li>The entangling of bech32 encoding makes it awkward to send
@@ -24,72 +24,72 @@ in other forms (e.g. inside the lightning network itself).</li>
 <li>The signature applying to the entire invoice makes it impossible
 to prove an invoice without revealing its entirety.</li>
 <li>Fields cannot generally be extracted for external use: the <code>h</code>
-field was a boutique extraction of the <code>d</code> field, only.</li>
-<li>The lack of &#39;it&#39;s OK to be odd&#39; rule makes backwards compatibility
+field was a boutique extraction of the <code>d</code> field only.</li>
+<li>The lack of the &#39;it&#39;s OK to be odd&#39; rule makes backward compatibility
 harder.</li>
 <li>The &#39;human-readable&#39; idea of separating amounts proved fraught:
 <code>p</code> was often mishandled, and amounts in pico-bitcoin are harder
 than the modern satoshi-based counting.</li>
-<li>The bech32 encoding was found to have an issue with extensions,
+<li>Developers found the bech32 encoding to have an issue with extensions,
 which means we want to replace or discard it anyway.</li>
 <li>The <code>payment_secret</code> designed to prevent probing by other nodes in
 the path was only useful if the invoice remained private between the
 payer and payee.</li>
-<li>Invoices must be given per-user, and are actively dangerous if two
+<li>Invoices must be given per user and are actively dangerous if two
 payment attempts are made for the same user.</li>
 </ol>
 <h1 id="payment-flow-scenarios">Payment Flow Scenarios</h1>
 <p>Here we use &quot;user&quot; as shorthand for the individual user&#39;s lightning
-node, and &quot;merchant&quot; as the shorthand for the node of someone who is
+node and &quot;merchant&quot; as the shorthand for the node of someone who is
 selling or has sold something.</p>
 <p>There are two basic payment flows supported by BOLT 12:</p>
 <p>The general user-pays-merchant flow is:</p>
 <ol>
-<li>A merchant publishes an <em>offer</em> (&quot;send me money&quot;), such as on a web page or a QR code.</li>
+<li>A merchant publishes an <em>offer</em>, such as on a web page or a QR code.</li>
 <li>Every user requests a unique <em>invoice</em> over the lightning network
-using an <em>invoice_request</em> message.</li>
+using an <em>invoice_request</em> message, which contains the offer fields.</li>
 <li>The merchant replies with the <em>invoice</em>.</li>
-<li>The user makes a payment to the merchant indicated by the invoice.</li>
+<li>The user makes a payment to the merchant as indicated by the invoice.</li>
 </ol>
 <p>The merchant-pays-user flow (e.g. ATM or refund):</p>
 <ol>
-<li>The merchant provides a user-specific <em>offer</em> (&quot;take my money&quot;) in a web page or QR code,
-with an amount (for a refund, also a reference to the to-be-refunded
-invoice).</li>
-<li>The user sends an <em>invoice</em> for the amount in the <em>offer</em> (for a
-refund, a proof that they requested the original)</li>
-<li>The merchant makes a payment to the user indicated by the invoice.</li>
+<li>The merchant publishes an <em>invoice_request</em> which contains offer fields
+which refer to its attempt to send money, including an amount.</li>
+<li>The user sends an <em>invoice</em> over the lightning network for the amount in the
+<em>invoice_request</em>, using a (possibly temporary) <em>invoice_node_id</em>.</li>
+<li>The merchant confirms the <em>invoice_node_id</em> to ensure it&#39;s about to pay the correct
+person, and makes a payment to the invoice.</li>
 </ol>
 <h2 id="payment-proofs-and-payer-proofs">Payment Proofs and Payer Proofs</h2>
 <p>Note that the normal lightning &quot;proof of payment&quot; can only demonstrate that an
 invoice was paid (by showing the preimage of the <code>payment_hash</code>), not who paid
 it.  The merchant can claim an invoice was paid, and once revealed, anyone can
 claim they paid the invoice, too.[1]</p>
-<p>Providing a key in <em>invoice_request</em> allows a user to prove that they were the one
+<p>Providing a key in <em>invoice_request</em> allows the payer to prove that they were the one
 to request the invoice.  In addition, the Merkle construction of the BOLT 12
-invoice signature allows the user to selectively reveal fields of the invoice
-in case of dispute.</p>
+invoice signature allows the user to reveal invoice fields in case
+of a dispute selectively.</p>
 <h1 id="encoding">Encoding</h1>
 <p>Each of the forms documented here are in
 <a href="01-messaging.md#type-length-value-format">TLV</a> format.</p>
 <p>The supported ASCII encoding is the human-readable prefix, followed by a
 <code>1</code>, followed by a bech32-style data string of the TLVs in order,
 optionally interspersed with <code>+</code> (for indicating additional data is to
-come).</p>
+come).  There is no checksum, unlike bech32m.</p>
 <h2 id="requirements">Requirements</h2>
 <p>Readers of a bolt12 string:</p>
 <ul>
-<li>if it encounters a <code>+</code> followed zero or more whitespace characters between 
+<li>if it encounters a <code>+</code> followed by zero or more whitespace characters between 
 two bech32 characters:<ul>
 <li>MUST remove the <code>+</code> and whitespace.</li>
 </ul>
 </li>
 </ul>
 <h2 id="rationale">Rationale</h2>
-<p>The use of bech32 is arbitrary, but already exists in the bitcoin
+<p>The use of bech32 is arbitrary but already exists in the bitcoin
 world.  We currently omit the six-character trailing checksum: QR
-codes have their own checksums, bech32 doesn&#39;t protect against many
-length differences, and bech32m is not yet widely supported.</p>
+codes have their own checksums anyway, and errors don&#39;t result in loss
+of funds, simply an invalid offer (or inability to parse).</p>
 <p>The use of <code>+</code> (which is ignored) allows use over limited
 text fields like Twitter:</p>
 <pre><code>l<span class="hljs-symbol">no1</span>xxxxxxxx+
@@ -98,133 +98,394 @@ yyyyyyyyyyyy+
 
 zzzzz
 </code></pre><p>See <a href="bolt12/format-string-test.json">format-string-test.json</a>.</p>
-<h2 id="signature-calculation">Signature Calculation</h2>
+<h1 id="signature-calculation">Signature Calculation</h1>
 <p>All signatures are created as per
-<a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki">BIP-340</a>,
+<a href="https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki">BIP-340</a>
 and tagged as recommended there.  Thus we define H(<code>tag</code>,<code>msg</code>) as
 SHA256(SHA256(<code>tag</code>) || SHA256(<code>tag</code>) || <code>msg</code>), and SIG(<code>tag</code>,<code>msg</code>,<code>key</code>)
 as the signature of H(<code>tag</code>,<code>msg</code>) using <code>key</code>.</p>
-<p>Each form is signed using one or more TLV signature elements; TLV
-types 240 through 1000 are considered signature elements.  For these
+<p>Each form is signed using one or more <em>signature TLV elements</em>: TLV
+types 240 through 1000 (inclusive).  For these,
 the tag is &quot;lightning&quot; || <code>messagename</code> || <code>fieldname</code>, and <code>msg</code> is the
 Merkle-root; &quot;lightning&quot; is the literal 9-byte ASCII string,
-<code>messagename</code> is the name of the TLV stream being signed (i.e. &quot;offer&quot;, &quot;invoice_request&quot; or &quot;invoice&quot;) and the <code>fieldname</code> is the TLV field containing the
-signature (e.g. &quot;signature&quot; or &quot;payer_signature&quot;).</p>
+<code>messagename</code> is the name of the TLV stream being signed (i.e. &quot;invoice_request&quot; or &quot;invoice&quot;) and the <code>fieldname</code> is the TLV field containing the
+signature (e.g. &quot;signature&quot;).</p>
 <p>The formulation of the Merkle tree is similar to that proposed in
-[BIP-taproot], with each TLV leaf paired with a nonce leaf to avoid
-revealing adjacent nodes in proofs (assuming there is a non-revealed TLV
-which has enough entropy).</p>
+<a href="https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki">BIP-341</a>,
+with each TLV leaf paired with a nonce leaf to avoid
+revealing adjacent nodes in proofs.</p>
 <p>The Merkle tree&#39;s leaves are, in TLV-ascending order for each tlv:</p>
 <ol>
-<li>The H(<code>LnLeaf</code>,tlv).</li>
-<li>The H(<code>LnAll</code>||all-tlvs,tlv) where &quot;all-tlvs&quot; consists of all non-signature TLV entries appended in ascending order.</li>
+<li>The H(&quot;LnLeaf&quot;,tlv).</li>
+<li>The H(&quot;LnNonce&quot;||first-tlv,tlv-type) where first-tlv is the numerically-first TLV entry in the stream, and tlv-type is the &quot;type&quot; field (1-9 bytes) of the current tlv.</li>
 </ol>
-<p>The Merkle tree inner nodes are H(<code>LnBranch</code>, lesser-SHA256||greater-SHA256);
-this ordering means that proofs are more compact since left/right is
+<p>The Merkle tree inner nodes are H(&quot;LnBranch&quot;, lesser-SHA256||greater-SHA256);
+this ordering means proofs are more compact since left/right is
 inherently determined.</p>
-<p>If there are not exactly a power of 2 leaves, then the tree depth will
+<p>If there is not exactly a power of 2 leaves, then the tree depth will
 be uneven, with the deepest tree on the lowest-order leaves.</p>
-<p>e.g. consider the encoding of an <code>offer</code> <code>signature</code> with TLVs TLV1, TLV2 and TLV3:</p>
-<pre><code>L1=H(<span class="hljs-string">"LnLeaf"</span>,TLV1)
-L1nonce=H(<span class="hljs-string">"LnAll"</span>|<span class="hljs-type">|TLV1</span>|<span class="hljs-type">|TLV2</span>|<span class="hljs-type">|TLV3</span>,TLV1) 
-L2=H(<span class="hljs-string">"LnLeaf"</span>,TLV2)
-L2nonce=H(<span class="hljs-string">"LnAll"</span>|<span class="hljs-type">|TLV1</span>|<span class="hljs-type">|TLV2</span>|<span class="hljs-type">|TLV3</span>,TLV2) 
-L3=H(<span class="hljs-string">"LnLeaf"</span>,TLV3)
-L3nonce=H(<span class="hljs-string">"LnAll"</span>|<span class="hljs-type">|TLV1</span>|<span class="hljs-type">|TLV2</span>|<span class="hljs-type">|TLV3</span>,TLV3) 
+<p>e.g. consider the encoding of an <code>invoice</code> <code>signature</code> with TLVs TLV1, TLV2, and TLV3 (of types 1, 2 and 3 respectively):</p>
+<pre><code>L1=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnLeaf"</span>,TLV1)
+L1nonce=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnNonce"</span>||TLV1,1)
+L2=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnLeaf"</span>,TLV2)
+L2nonce=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnNonce"</span>||TLV1,2)
+L3=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnLeaf"</span>,TLV3)
+L3nonce=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnNonce"</span>||TLV1,3)
 
-Assume L1 &lt; L1nonce, and L2 &gt; L2nonce.
+Assume L1 &lt; L1nonce, L2 &gt; L2nonce and L3 &gt; L3nonce.
 
    L1    L1nonce                      L2   L2nonce                L3   L3nonce
      \   /                             \   /                       \   /
       v v                               v v                         v v
-L1A=H(<span class="hljs-string">"LnBranch"</span>,L1|<span class="hljs-type">|L1nonce</span>) L2A=H(<span class="hljs-string">"LnBranch"</span>,L2nonce|<span class="hljs-type">|L2</span>)  L3A=H(<span class="hljs-string">"LnBranch"</span>,L3nonce|<span class="hljs-type">|L3</span>)
+L1A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L1||L1nonce) L2A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L2nonce||L2)  L3A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L3nonce||L3)
 
 Assume L1A &lt; L2A:
 
-       L1A   L2A                                 L3A=H(<span class="hljs-string">"LnBranch"</span>,L3nonce|<span class="hljs-type">|L3</span>)
+       L1A   L2A                                 L3A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L3nonce||L3)
          \   /                                    |
-          <span class="hljs-type">v</span> v                                     v
-  L1A2A=H(<span class="hljs-string">"LnBranch"</span>,L1A|<span class="hljs-type">|L2A</span>)                   L3A=H(<span class="hljs-string">"LnBranch"</span>,L3nonce|<span class="hljs-type">|L3</span>)
+          v v                                     v
+  L1A2A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L1A||L2A)                   L3A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L3nonce||L3)
 
 Assume L1A2A &gt; L3A:
 
-  L1A2A=H(<span class="hljs-string">"LnBranch"</span>,L1A|<span class="hljs-type">|L2A</span>)          L3A
+  L1A2A=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L1A||L2A)          L3A
                           \            /
                            v          v
-                Root=H(<span class="hljs-string">"LnBranch"</span>,L3A|<span class="hljs-type">|L1A2A</span>)
+                Root=<span class="hljs-built_in">H</span>(<span class="hljs-string">"LnBranch"</span>,L3A||L1A2A)
 
-Signature = SIG(<span class="hljs-string">"lightningoffersignature"</span>, Root, nodekey)
+Signature = SIG(<span class="hljs-string">"lightninginvoicesignature"</span>, Root, nodekey)
 </code></pre><h1 id="offers">Offers</h1>
-<p>Offers are a precursor to an invoice: readers will either request an invoice
-(or multiple) or send an invoice based on the offer.  An offer can be much longer-lived than a
-particular invoice, so has some different characteristics; in particular it
-can be recurring, and the amount can be in a non-lightning currency.  It&#39;s
-also designed for compactness, to easily fit inside a QR code.</p>
+<p>Offers are a precursor to an invoice_request: readers will request an invoice
+(or multiple) based on the offer.  An offer can be much longer-lived than a
+particular invoice, so it has some different characteristics; in particular the amount can be in a non-lightning currency.  It&#39;s
+also designed for compactness to fit inside a QR code easily.</p>
+<p>Note that the non-signature TLV elements get mirrored into
+invoice_request and invoice messages, so they each have specific and
+distinct TLV ranges.</p>
 <p>The human-readable prefix for offers is <code>lno</code>.</p>
 <h2 id="tlv-fields-for-offers">TLV Fields for Offers</h2>
 <ol>
 <li><code>tlv_stream</code>: <code>offer</code></li>
-<li><p>types:</p>
-<ol>
-<li>type: 2 (<code>chains</code>)</li>
+<li>types:<ol>
+<li>type: 2 (<code>offer_chains</code>)</li>
 <li>data:<ul>
 <li>[<code>...*chain_hash</code>:<code>chains</code>]</li>
 </ul>
 </li>
-<li>type: 6 (<code>currency</code>)</li>
+<li>type: 4 (<code>offer_metadata</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>data</code>]</li>
+</ul>
+</li>
+<li>type: 6 (<code>offer_currency</code>)</li>
 <li>data:<ul>
 <li>[<code>...*utf8</code>:<code>iso4217</code>]</li>
 </ul>
 </li>
-<li>type: 8 (<code>amount</code>)</li>
+<li>type: 8 (<code>offer_amount</code>)</li>
 <li>data:<ul>
 <li>[<code>tu64</code>:<code>amount</code>]</li>
 </ul>
 </li>
-<li>type: 10 (<code>description</code>)</li>
+<li>type: 10 (<code>offer_description</code>)</li>
 <li>data:<ul>
 <li>[<code>...*utf8</code>:<code>description</code>]</li>
 </ul>
 </li>
-<li>type: 12 (<code>features</code>)</li>
+<li>type: 12 (<code>offer_features</code>)</li>
 <li>data:<ul>
 <li>[<code>...*byte</code>:<code>features</code>]</li>
 </ul>
 </li>
-<li>type: 14 (<code>absolute_expiry</code>)</li>
+<li>type: 14 (<code>offer_absolute_expiry</code>)</li>
 <li>data:<ul>
 <li>[<code>tu64</code>:<code>seconds_from_epoch</code>]</li>
 </ul>
 </li>
-<li>type: 16 (<code>paths</code>)</li>
+<li>type: 16 (<code>offer_paths</code>)</li>
 <li>data:<ul>
 <li>[<code>...*blinded_path</code>:<code>paths</code>]</li>
 </ul>
 </li>
-<li>type: 20 (<code>issuer</code>)</li>
+<li>type: 18 (<code>offer_issuer</code>)</li>
 <li>data:<ul>
 <li>[<code>...*utf8</code>:<code>issuer</code>]</li>
 </ul>
 </li>
-<li>type: 22 (<code>quantity_min</code>)</li>
-<li>data:<ul>
-<li>[<code>tu64</code>:<code>min</code>]</li>
-</ul>
-</li>
-<li>type: 24 (<code>quantity_max</code>)</li>
+<li>type: 20 (<code>offer_quantity_max</code>)</li>
 <li>data:<ul>
 <li>[<code>tu64</code>:<code>max</code>]</li>
 </ul>
 </li>
-<li>type: 30 (<code>node_id</code>)</li>
+<li>type: 22 (<code>offer_node_id</code>)</li>
 <li>data:<ul>
-<li>[<code>point32</code>:<code>node_id</code>]</li>
+<li>[<code>point</code>:<code>node_id</code>]</li>
 </ul>
 </li>
-<li>type: 54 (<code>send_invoice</code>)</li>
-<li>type: 34 (<code>refund_for</code>)</li>
+</ol>
+</li>
+</ol>
+<h2 id="requirements-for-offers">Requirements For Offers</h2>
+<p>A writer of an offer:</p>
+<ul>
+<li>MUST NOT set any tlv fields greater or equal to 80, or tlv field 0.</li>
+<li>MUST set <code>offer_node_id</code> to the node&#39;s public key to request the invoice from.</li>
+<li>MUST set <code>offer_description</code> to a complete description of the purpose
+of the payment.</li>
+<li>if the chain for the invoice is not solely bitcoin:<ul>
+<li>MUST specify <code>offer_chains</code> the offer is valid for.</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MAY omit <code>offer_chains</code>, implying that bitcoin is only chain.</li>
+</ul>
+</li>
+<li>if a specific minimum <code>offer_amount</code> is required for successful payment:<ul>
+<li>MUST set <code>offer_amount</code> to the amount expected (per item).</li>
+<li>if the currency for <code>offer_amount</code> is that of all entries in <code>chains</code>:<ul>
+<li>MUST specify <code>amount</code> in multiples of the minimum lightning-payable unit
+(e.g. milli-satoshis for bitcoin).</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST specify <code>offer_currency</code> <code>iso4217</code> as an ISO 4712 three-letter code.</li>
+<li>MUST specify <code>offer_amount</code> in the currency unit adjusted by the ISO 4712
+exponent (e.g. USD cents).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST NOT set <code>offer_amount</code></li>
+<li>MUST NOT set <code>offer_currency</code></li>
+</ul>
+</li>
+<li>MAY set <code>offer_metadata</code> for its own use.</li>
+<li>if it supports bolt12 offer features:<ul>
+<li>MUST set <code>offer_features</code>.<code>features</code> to the bitmap of bolt12 features.</li>
+</ul>
+</li>
+<li>if the offer expires:<ul>
+<li>MUST set <code>offer_absolute_expiry</code> <code>seconds_from_epoch</code> to the number of seconds
+after midnight 1 January 1970, UTC that invoice_request should not be
+attempted.</li>
+</ul>
+</li>
+<li>if it is connected only by private channels:<ul>
+<li>MUST include <code>offer_paths</code> containing one or more paths to the node from
+publicly reachable nodes.</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MAY include <code>offer_paths</code>.</li>
+</ul>
+</li>
+<li>if it includes <code>offer_paths</code>:<ul>
+<li>SHOULD ignore any invoice_request which does not use the path.</li>
+</ul>
+</li>
+<li>if it sets <code>offer_issuer</code>:<ul>
+<li>SHOULD set it to identify the issuer of the invoice clearly.</li>
+<li>if it includes a domain name:<ul>
+<li>SHOULD begin it with either user@domain or domain</li>
+<li>MAY follow with a space and more text</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>if it can supply more than one item for a single invoice:<ul>
+<li>if the maximum quantity is known:<ul>
+<li>MUST set that maximum in <code>offer_quantity_max</code>.</li>
+<li>MUST NOT set <code>offer_quantity_max</code> to 0.</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST set <code>offer_quantity_max</code> to 0.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST NOT set <code>offer_quantity_max</code>.</li>
+</ul>
+</li>
+</ul>
+<p>A reader of an offer:</p>
+<ul>
+<li>if the offer contains any TLV fields greater or equal to 80:<ul>
+<li>MUST NOT respond to the offer.</li>
+</ul>
+</li>
+<li>if <code>offer_features</code> contains unknown <em>odd</em> bits that are non-zero:<ul>
+<li>MUST ignore the bit.</li>
+</ul>
+</li>
+<li>if <code>offer_features</code> contains unknown <em>even</em> bits that are non-zero:<ul>
+<li>MUST NOT respond to the offer.</li>
+<li>SHOULD indicate the unknown bit to the user.</li>
+</ul>
+</li>
+<li>if <code>offer_chains</code> is not set:<ul>
+<li>if the node does not accept bitcoin invoices:<ul>
+<li>MUST NOT respond to the offer</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>otherwise: (<code>offer_chains</code> is set):<ul>
+<li>if the node does not accept invoices for any of the <code>chains</code>:<ul>
+<li>MUST NOT respond to the offer</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>if <code>offer_description</code> is not set:<ul>
+<li>MUST NOT respond to the offer.</li>
+</ul>
+</li>
+<li>if <code>offer_node_id</code> is not set:<ul>
+<li>MUST NOT respond to the offer.</li>
+</ul>
+</li>
+<li>if it uses <code>offer_amount</code> to provide the user with a cost estimate:<ul>
+<li>MUST take into account the currency units for <code>offer_amount</code>:<ul>
+<li><code>offer_currency</code> field if set</li>
+<li>otherwise, the minimum lightning-payable unit (e.g. milli-satoshis for
+bitcoin).</li>
+</ul>
+</li>
+<li>MUST warn user if amount of actual invoice differs significantly
+  from that estimate.</li>
+</ul>
+</li>
+<li>SHOULD not respond to an offer if the current time is after
+<code>offer_absolute_expiry</code>.</li>
+</ul>
+<h2 id="rationale">Rationale</h2>
+<p>The entire offer is reflected in the invoice_request, both for
+completeness (so all information will be returned in the invoice), and
+so that the offer node can be stateless.  This makes <code>offer_metadata</code>
+particularly useful, since it can contain an authentication cookie to
+validate the other fields.</p>
+<p>A signature is unnecessary, and makes for a longer string (potentially
+limiting QR code use on low-end cameras); if the offer has an error, no
+invoice will be given since the request includes all the non-signature 
+fields.</p>
+<p><code>offer_quantity_max</code> is allowed to be 1, which seems useless, but
+useful in a system which bases it on available stock.  It would be
+painful to have to special-case the &quot;only one left&quot; offer generation.</p>
+<h1 id="invoice-requests">Invoice Requests</h1>
+<p>Invoice Requests are a request for an invoice; the human-readable prefix for
+invoice requests is <code>lnr</code>.</p>
+<p>There are two similar-looking uses for invoice requests, which are
+almost identical from a workflow perspective, but are quite different
+from a user&#39;s point of view.</p>
+<p>One is a response to an offer; this contains the <code>offer_node_id</code> and
+all other offer details, and is generally received over an onion
+message: if it&#39;s valid and refers to a known offer, the response is
+generally to reply with an <code>invoice</code> using the <code>reply_path</code> field of
+the onion message.</p>
+<p>The second case is publishing an <code>invoice_request</code> without an offer,
+such as via QR code.  It contains no <code>offer_node_id</code> (using the
+<code>invreq_payer_id</code> instead, as it in the one paying), and the
+other offer fields are filled by the creator of the <code>invoice_request</code>,
+forming a kind of offer-to-send-money.</p>
+<p>Note: the <code>invreq_metadata</code> is numbered 0 (not in the
+80-159 range for other invreq fields) as this is the first
+TLV element, which ensures payer-provided entropy is used in hashing
+for <a href="#signature-calculation">Signature Calculation</a>.</p>
+<h2 id="tlv-fields-for-invoice_request-">TLV Fields for <code>invoice_request</code></h2>
+<ol>
+<li><code>tlv_stream</code>: <code>invoice_request</code></li>
+<li>types:<ol>
+<li>type: 0 (<code>invreq_metadata</code>)</li>
 <li>data:<ul>
-<li>[<code>sha256</code>:<code>refunded_payment_hash</code>]</li>
+<li>[<code>...*byte</code>:<code>blob</code>]</li>
+</ul>
+</li>
+<li>type: 2 (<code>offer_chains</code>)</li>
+<li>data:<ul>
+<li>[<code>...*chain_hash</code>:<code>chains</code>]</li>
+</ul>
+</li>
+<li>type: 4 (<code>offer_metadata</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>data</code>]</li>
+</ul>
+</li>
+<li>type: 6 (<code>offer_currency</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>iso4217</code>]</li>
+</ul>
+</li>
+<li>type: 8 (<code>offer_amount</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>amount</code>]</li>
+</ul>
+</li>
+<li>type: 10 (<code>offer_description</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>description</code>]</li>
+</ul>
+</li>
+<li>type: 12 (<code>offer_features</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>features</code>]</li>
+</ul>
+</li>
+<li>type: 14 (<code>offer_absolute_expiry</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>seconds_from_epoch</code>]</li>
+</ul>
+</li>
+<li>type: 16 (<code>offer_paths</code>)</li>
+<li>data:<ul>
+<li>[<code>...*blinded_path</code>:<code>paths</code>]</li>
+</ul>
+</li>
+<li>type: 18 (<code>offer_issuer</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>issuer</code>]</li>
+</ul>
+</li>
+<li>type: 20 (<code>offer_quantity_max</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>max</code>]</li>
+</ul>
+</li>
+<li>type: 22 (<code>offer_node_id</code>)</li>
+<li>data:<ul>
+<li>[<code>point</code>:<code>node_id</code>]</li>
+</ul>
+</li>
+<li>type: 80 (<code>invreq_chain</code>)</li>
+<li>data:<ul>
+<li>[<code>chain_hash</code>:<code>chain</code>]</li>
+</ul>
+</li>
+<li>type: 82 (<code>invreq_amount</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>msat</code>]</li>
+</ul>
+</li>
+<li>type: 84 (<code>invreq_features</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>features</code>]</li>
+</ul>
+</li>
+<li>type: 86 (<code>invreq_quantity</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>quantity</code>]</li>
+</ul>
+</li>
+<li>type: 88 (<code>invreq_payer_id</code>)</li>
+<li>data:<ul>
+<li>[<code>point</code>:<code>key</code>]</li>
+</ul>
+</li>
+<li>type: 89 (<code>invreq_payer_note</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>note</code>]</li>
 </ul>
 </li>
 <li>type: 240 (<code>signature</code>)</li>
@@ -234,444 +495,304 @@ also designed for compactness, to easily fit inside a QR code.</p>
 </li>
 </ol>
 </li>
-<li><p>subtype: <code>blinded_path</code></p>
-</li>
-<li>data:<ul>
-<li>[<code>point</code>:<code>first_node_id</code>]</li>
-<li>[<code>point</code>:<code>blinding</code>]</li>
-<li>[<code>byte</code>:<code>num_hops</code>]</li>
-<li>[<code>num_hops*onionmsg_path</code>:<code>path</code>]</li>
-</ul>
-</li>
 </ol>
-<h2 id="requirements-for-offers">Requirements For Offers</h2>
-<p>A writer of an offer:</p>
+<h2 id="requirements-for-invoice-requests">Requirements for Invoice Requests</h2>
+<p>The writer:</p>
 <ul>
-<li>MUST set <code>node_id</code> to the public key of the node to request the invoice from.</li>
-<li>MAY specify exactly one signature TLV: <code>signature</code>:<ul>
-<li>If so, it MUST set <code>sig</code> to the signature using <code>node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
+<li>if it is responding to an offer:<ul>
+<li>MUST copy all fields from the offer (including unknown fields).</li>
+<li>if <code>offer_chains</code> is set:<ul>
+<li>MUST set <code>invreq_chain</code> to one of <code>offer_chains</code> unless that chain is bitcoin, in which case it MAY omit <code>invreq_chain</code>.</li>
 </ul>
 </li>
-<li>MUST set <code>description</code> to a complete description of the purpose
-of the payment.</li>
+<li>otherwise:<ul>
+<li>if it sets <code>invreq_chain</code> it MUST set it to bitcoin.</li>
+</ul>
+</li>
+<li>MUST set <code>signature</code>.<code>sig</code> as detailed in <a href="#signature-calculation">Signature Calculation</a> using the <code>invreq_payer_id</code>.</li>
+<li>if <code>offer_amount</code> is not present:<ul>
+<li>MUST specify <code>invreq_amount</code>.</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MAY omit <code>invreq_amount</code>.</li>
+<li>if it sets <code>invreq_amount</code>:<ul>
+<li>MUST specify <code>invreq_amount</code>.<code>msat</code> as greater or equal to amount expected by <code>offer_amount</code> (and, if present, <code>offer_currency</code> and <code>invreq_quantity</code>).</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>MUST set <code>invreq_payer_id</code> to a transient public key.</li>
+<li>MUST remember the secret key corresponding to <code>invreq_payer_id</code>.</li>
+<li>if <code>offer_quantity_max</code> is present:<ul>
+<li>MUST set <code>invreq_quantity</code> to greater than zero.</li>
+<li>if <code>offer_quantity_max</code> is non-zero:<ul>
+<li>MUST set <code>invreq_quantity</code> less than or equal to <code>offer_quantity_max</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST NOT set <code>invreq_quantity</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>otherwise (not responding to an offer):<ul>
+<li>MUST set (or not set) <code>offer_description</code>, <code>offer_absolute_expiry</code>, <code>offer_paths</code> and <code>offer_issuer</code> as it would for an offer.</li>
+<li>MUST set <code>invreq_payer_id</code> as it would set <code>offer_node_id</code> for an offer.</li>
+<li>MUST NOT include <code>signature</code>, <code>offer_metadata</code>, <code>offer_chains</code>, <code>offer_amount</code>, <code>offer_currency</code>, <code>offer_features</code>, <code>offer_quantity_max</code> or <code>offer_node_id</code></li>
 <li>if the chain for the invoice is not solely bitcoin:<ul>
-<li>MUST specify <code>chains</code> the offer is valid for.</li>
+<li>MUST specify <code>invreq_chain</code> the offer is valid for.</li>
 </ul>
 </li>
-<li>otherwise:<ul>
-<li>the bitcoin chain is implied as the first and only entry.</li>
+<li>MUST set <code>invreq_amount</code>.</li>
 </ul>
 </li>
-<li>if a specific minimum <code>amount</code> is required for successful payment:<ul>
-<li>MUST set <code>amount</code> to the amount expected (per item).</li>
-<li>if the currency for <code>amount</code> is that of the first entry in <code>chains</code>:<ul>
-<li>MUST specify <code>amount</code> in multiples of the minimum lightning-payable unit
-(e.g. milli-satoshis for bitcoin).</li>
+<li>MUST NOT set any non-signature TLV fields greater or equal to 160.</li>
+<li>MUST set <code>invreq_metadata</code> to an unpredictable series of bytes.</li>
+<li>if it sets <code>invreq_amount</code>:<ul>
+<li>MUST set <code>msat</code> in multiples of the minimum lightning-payable unit
+  (e.g. milli-satoshis for bitcoin) for <code>invreq_chain</code> (or for bitcoin, if there is no <code>invreq_chain</code>).</li>
 </ul>
 </li>
-<li>otherwise:<ul>
-<li>MUST specify <code>iso4217</code> as an ISO 4712 three-letter code.</li>
-<li>MUST specify <code>amount</code> in the currency unit adjusted by the ISO 4712
-exponent (e.g. USD cents).</li>
+<li>if it supports bolt12 invoice request features:<ul>
+<li>MUST set <code>invreq_features</code>.<code>features</code> to the bitmap of features.</li>
 </ul>
 </li>
 </ul>
-</li>
-<li>if it supports offer features:<ul>
-<li>SHOULD set <code>features</code> to the bitmap of offer features.</li>
-</ul>
-</li>
-<li>if the offer expires:<ul>
-<li>MUST set <code>absolute_expiry</code> <code>seconds_from_epoch</code> to the number of seconds
-after midnight 1 January 1970, UTC that invoice_request should not be
-attempted.</li>
-</ul>
-</li>
-<li>if it is connected only by private channels:<ul>
-<li>MUST include <code>paths</code> containing one or more paths to the node from
-publicly reachable nodes.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MAY include <code>paths</code>.</li>
-</ul>
-</li>
-<li>if it includes <code>paths</code>:<ul>
-<li>SHOULD ignore any invoice_request which does not use the path.</li>
-</ul>
-</li>
-<li>if it sets <code>issuer</code>:<ul>
-<li>SHOULD set it to clearly identify the issuer of the invoice.</li>
-<li>if it includes a domain name:<ul>
-<li>SHOULD begin it with either user@domain or domain</li>
-<li>MAY follow with a space and more text</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>if it can supply more than one item for a single invoice<ul>
-<li>if the minimum quantity is more than 1:<ul>
-<li>MUST set that minimum in <code>quantity_min</code></li>
-</ul>
-</li>
-<li>if the maximum quantity is known:<ul>
-<li>MUST set that maximum in <code>quantity_max</code></li>
-</ul>
-</li>
-<li>if neither:<ul>
-<li>MUST set <code>quantity_min</code> to 1 to indicate <code>quantity</code> is supported.</li>
-</ul>
-</li>
-<li>if both:<ul>
-<li>MUST set <code>quantity_min</code> less than or equal to <code>quantity_max</code>.</li>
-</ul>
-</li>
-<li>MUST NOT set <code>quantity_min</code> or <code>quantity_max</code> less than 1.</li>
-</ul>
-</li>
-<li>if <code>send_invoice</code> is present:<ul>
-<li>if the offer is for a partial or full refund for a previously-paid
-invoice:<ul>
-<li>SHOULD set <code>refunded_payment_hash</code> to the <code>payment_hash</code> of that
-invoice.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT set <code>refunded_payment_hash</code>.</li>
-</ul>
-</li>
-</ul>
-<p>A reader of an offer:</p>
+<p>The reader:</p>
 <ul>
-<li>if <code>features</code> contains unknown <em>odd</em> bits that are non-zero:<ul>
+<li>MUST fail the request if <code>invreq_payer_id</code> or <code>invreq_metadata</code> are not present.</li>
+<li>MUST fail the request if any non-signature TLV fields greater or equal to 160.</li>
+<li>if <code>invreq_features</code> contains unknown <em>odd</em> bits that are non-zero:<ul>
 <li>MUST ignore the bit.</li>
 </ul>
 </li>
-<li>if <code>features</code> contains unknown <em>even</em> bits that are non-zero:<ul>
-<li>MUST NOT respond to the offer.</li>
-<li>SHOULD indicate the unknown bit to the user.</li>
+<li>if <code>invreq_features</code> contains unknown <em>even</em> bits that are non-zero:<ul>
+<li>MUST fail the request.</li>
 </ul>
 </li>
-<li>if <code>node_id</code> or <code>description</code> is not set:<ul>
-<li>MUST NOT respond to the offer.</li>
+<li>MUST fail the request if <code>signature</code> is not correct as detailed in <a href="#signature-calculation">Signature Calculation</a> using the <code>invreq_payer_id</code>.</li>
+<li>if <code>offer_node_id</code> is present (response to an offer):<ul>
+<li>MUST fail the request if the offer fields do not exactly match a valid, unexpired offer.</li>
+<li>if <code>offer_quantity_max</code> is present:<ul>
+<li>MUST fail the request if there is no <code>invreq_quantity</code> field.</li>
+<li>if <code>offer_quantity_max</code> is non-zero:<ul>
+<li>MUST fail the request if <code>invreq_quantity</code> is zero, OR greater than <code>offer_quantity_max</code>.</li>
 </ul>
 </li>
-<li>if <code>signature</code> is present, but is not a valid signature using <code>node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>:<ul>
-<li>MUST NOT respond to the offer.</li>
-</ul>
-</li>
-<li>SHOULD gain user consent for recurring payments.</li>
-<li>SHOULD allow user to view and cancel recurring payments.</li>
-<li>if it uses <code>amount</code> to provide the user with a cost estimate:<ul>
-<li>MUST warn user if amount of actual invoice differs significantly
-  from that expectation.</li>
-</ul>
-</li>
-<li>SHOULD not respond to an offer if the current time is after
-<code>absolute_expiry</code>.</li>
-<li>FIXME: more!</li>
-</ul>
-<h2 id="rationale">Rationale</h2>
-<p>A signature is optional, because it makes for a longer string (potentially
-limiting QR code use on low-end cameras); if the offer has an error, no
-invoice will be given (or, for <code>send_invoice</code> offers, accepted), since
-the <code>offer_id</code> already covers all the non-signature fields.</p>
-<h1 id="invoice-requests">Invoice Requests</h1>
-<p>Invoice Requests are a request for an invoice; the human-readable prefix for
-invoices is <code>lnr</code>.</p>
-<h2 id="tlv-fields-for-invoice_request-">TLV Fields for <code>invoice_request</code></h2>
-<ol>
-<li><code>tlv_stream</code>: <code>invoice_request</code></li>
-<li>types:<ol>
-<li>type: 3 (<code>chain</code>)</li>
-<li>data:<ul>
-<li>[<code>chain_hash</code>:<code>chain</code>]</li>
-</ul>
-</li>
-<li>type: 4 (<code>offer_id</code>)</li>
-<li>data:<ul>
-<li>[<code>sha256</code>:<code>offer_id</code>]</li>
-</ul>
-</li>
-<li>type: 8 (<code>amount</code>)</li>
-<li>data:<ul>
-<li>[<code>tu64</code>:<code>msat</code>]</li>
-</ul>
-</li>
-<li>type: 12 (<code>features</code>)</li>
-<li>data:<ul>
-<li>[<code>...*byte</code>:<code>features</code>]</li>
-</ul>
-</li>
-<li>type: 32 (<code>quantity</code>)</li>
-<li>data:<ul>
-<li>[<code>tu64</code>:<code>quantity</code>]</li>
-</ul>
-</li>
-<li>type: 38 (<code>payer_key</code>)</li>
-<li>data:<ul>
-<li>[<code>point32</code>:<code>key</code>]</li>
-</ul>
-</li>
-<li>type: 39 (<code>payer_note</code>)</li>
-<li>data:<ul>
-<li>[<code>...*utf8</code>:<code>note</code>]</li>
-</ul>
-</li>
-<li>type: 50 (<code>payer_info</code>)</li>
-<li>data:<ul>
-<li>[<code>...*byte</code>:<code>blob</code>]</li>
-</ul>
-</li>
-<li>type: 56 (<code>replace_invoice</code>)</li>
-<li>data:<ul>
-<li>[<code>sha256</code>:<code>payment_hash</code>]</li>
-</ul>
-</li>
-<li>type: 240 (<code>payer_signature</code>)</li>
-<li>data:<ul>
-<li>[<code>bip340sig</code>:<code>sig</code>]</li>
-</ul>
-</li>
-</ol>
-</li>
-</ol>
-<h2 id="requirements-for-invoice-requests">Requirements for Invoice Requests</h2>
-<p>The writer of an invoice_request:</p>
-<ul>
-<li>MUST set <code>payer_key</code> to a transient public key.</li>
-<li>MUST remember the secret key corresponding to <code>payer_key</code>.</li>
-<li>MUST set <code>offer_id</code> to the Merkle root of the offer as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
-<li>MUST NOT set or imply any <code>chain_hash</code> not set or implied by the offer.</li>
-<li>MUST set <code>payer_signature</code> <code>sig</code> as detailed in <a href="#signature-calculation">Signature Calculation</a> using the <code>payer_key</code>.</li>
-<li>if the offer had a <code>quantity_min</code> or <code>quantity_max</code> field:<ul>
-<li>MUST set <code>quantity</code></li>
-<li>MUST set it within that (inclusive) range.</li>
 </ul>
 </li>
 <li>otherwise:<ul>
-<li>MUST NOT set <code>quantity</code></li>
+<li>MUST fail the request if there is an <code>invreq_quantity</code> field.</li>
 </ul>
 </li>
-<li>if the offer did not specify <code>amount</code>:<ul>
-<li>MUST specify <code>amount</code>.<code>msat</code> in multiples of the minimum lightning-payable unit
-(e.g. milli-satoshis for bitcoin) for <code>chain</code> (or for bitcoin, if there is no <code>chain</code>).</li>
+<li>if <code>offer_amount</code> is present:<ul>
+<li>MUST calculate the <em>expected amount</em> using the <code>offer_amount</code>:<ul>
+<li>if <code>offer_currency</code> is not the <code>invreq_chain</code> currency, convert to the
+<code>invreq_chain</code> currency.</li>
+<li>if <code>invreq_quantity</code> is present, multiply by <code>invreq_quantity</code>.<code>quantity</code>.</li>
 </ul>
 </li>
-<li>otherwise:<ul>
-<li>MAY omit <code>amount</code>.</li>
-<li>if it sets <code>amount</code>:<ul>
-<li>MUST specify <code>amount</code>.<code>msat</code> as greater or equal to amount expected by the offer
-(before any proportional period amount).</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>if the sender has a previous unpaid invoice (for the same offer) which it wants to cancel:<ul>
-<li>MUST set <code>payer_key</code> to the same as the previous invoice.</li>
-<li>MUST set <code>replace_invoice</code> to the <code>payment_hash</code> or the previous invoice.</li>
+<li>if <code>invreq_amount</code> is present:<ul>
+<li>MUST fail the request if <code>invreq_amount</code>.<code>msat</code> is less than the <em>expected amount</em>.</li>
+<li>MAY fail the request if <code>invreq_amount</code>.<code>msat</code> greatly exceeds the <em>expected amount</em>.</li>
 </ul>
 </li>
 </ul>
-<p>The reader of an invoice_request:</p>
-<ul>
-<li>MUST fail the request if <code>payer_key</code> is not present.</li>
-<li>if <code>chain</code> is not present:<ul>
+</li>
+<li>otherwise (no <code>offer_amount</code>):<ul>
+<li>MUST fail the request if it does not contain <code>invreq_amount</code>.</li>
+</ul>
+</li>
+<li>SHOULD send an invoice in response using the <code>onionmsg_tlv</code> <code>reply_path</code>.</li>
+</ul>
+</li>
+<li>otherwise (no <code>offer_node_id</code>, not a response to our offer):<ul>
+<li>MUST fail the request if any of the following are present:<ul>
+<li><code>offer_chains</code>, <code>offer_features</code> or <code>offer_quantity_max</code>.</li>
+</ul>
+</li>
+<li>MUST fail the request if <code>invreq_amount</code> is not present.</li>
+<li>MAY use <code>offer_amount</code> (or <code>offer_currency</code>) for informational display to user.</li>
+<li>if it sends an invoice in response:<ul>
+<li>MUST use <code>offer_paths</code> if present, otherwise MUST use <code>invreq_payer_id</code> as the node id to send to.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>if <code>invreq_chain</code> is not present:<ul>
 <li>MUST fail the request if bitcoin is not a supported chain.</li>
 </ul>
 </li>
 <li>otherwise:<ul>
-<li>MUST fail the request if <code>chain</code> is not a supported chain.</li>
-</ul>
-</li>
-<li>MUST fail the request if <code>features</code> contains unknown even bits.</li>
-<li>MUST fail the request if <code>offer_id</code> is not present.</li>
-<li>MUST fail the request if the <code>offer_id</code> does not refer to an unexpired offer.</li>
-<li>MUST fail the request if there is no <code>payer_signature</code> field.</li>
-<li>MUST fail the request if <code>payer_signature</code> is not correct.</li>
-<li>if the offer had a <code>quantity_min</code> or <code>quantity_max</code> field:<ul>
-<li>MUST fail the request if there is no <code>quantity</code> field.</li>
-<li>MUST fail the request if there is <code>quantity</code> is not within that (inclusive) range.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST fail the request if there is a <code>quantity</code> field.</li>
-</ul>
-</li>
-<li>if the offer included <code>amount</code>:<ul>
-<li>MUST calculate the <em>base invoice amount</em> using the offer <code>amount</code>:<ul>
-<li>if offer <code>currency</code> is not the invoice currency, convert to the
-invoice currency.</li>
-<li>if request contains <code>quantity</code>, multiply by <code>quantity</code>.</li>
-</ul>
-</li>
-<li>if the request contains <code>amount</code>:<ul>
-<li>MUST fail the request if its <code>amount</code> is less than the <em>base invoice amount</em>.</li>
-<li>MAY fail the request if its <code>amount</code> is much greater than the <em>base invoice amount</em>.</li>
-<li>MUST use the request&#39;s <code>amount</code> as the <em>base invoice amount</em>.</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST fail the request if it does not contain <code>amount</code>.</li>
-<li>MUST use the request <code>amount</code> as the <em>base invoice amount</em>.</li>
-</ul>
-</li>
-<li>if the offer has a <code>replace_invoice</code>:<ul>
-<li>if the <code>payment_hash</code> refers to an unpaid invoice for the same <code>offer_id</code> and <code>payer_key</code>:<ul>
-<li>MUST immediately expire/remove that unpaid invoice such that it cannot be paid in future.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST fail the request.</li>
-</ul>
-</li>
+<li>MUST fail the request if <code>invreq_chain</code>.<code>chain</code> is not a supported chain.</li>
 </ul>
 </li>
 </ul>
 <h2 id="rationale">Rationale</h2>
-<p><code>payer_info</code> might typically contain information about the derivation of the
-<code>payer_key</code>.  This should not leak any information (such as using a simple
+<p><code>invreq_metadata</code> might typically contain information about the derivation of the
+<code>invreq_payer_id</code>.  This should not leak any information (such as using a simple
 BIP-32 derivation path); a valid system might be for a node to maintain a base
-payer key, and encode a 128-bit tweak here.  The payer_key would be derived by
-tweaking the base key with SHA256(payer_base_pubkey || tweak).</p>
-<p><code>payer_note</code> allows you to compliment, taunt, or otherwise engrave
+payer key and encode a 128-bit tweak here.  The payer_id would be derived by
+tweaking the base key with SHA256(payer_base_pubkey || tweak).  It&#39;s also
+the first entry (if present), ensuring an unpredictable nonce for hashing.</p>
+<p><code>invreq_payer_note</code> allows you to compliment, taunt, or otherwise engrave
 graffiti into the invoice for all to see.</p>
 <p>Users can give a tip (or obscure the amount sent) by specifying an
-<code>amount</code> in their invoice request, even though the offer specifies an
-<code>amount</code>.  Obviously this will only be accepted by the recipient if
+<code>invreq_amount</code> in their invoice request, even though the offer specifies an
+<code>offer_amount</code>.  The recipient will only accept this if
 the invoice request amount exceeds the amount it&#39;s expecting (i.e. its
-<code>amount</code> after any currency conversion, multiplied by <code>quantity</code> if
-any).  Note that for recurring invoices with <code>proportional_amount</code>
-set, the <code>amount</code> in the invoice request will be scaled by the time in
-the period; the sender should not attempt to scale it.</p>
-<p><code>replace_invoice</code> allows the mutually-agreed removal of and old unpaid
-invoice; this can be used in the case of stuck payments.  If
-successful in replacing the stuck invoice, the sender may make a
-second payment such that it can prove double-payment should the
-receiver still accept the first, delayed payment.</p>
+<code>offer_amount</code> after any currency conversion, multiplied by <code>invreq_quantity</code>, if
+any).</p>
+<p>Non-offer-response <code>invoice_request</code>s are currently required to
+explicitly state the <code>invreq_amount</code> in the chain currency,
+so <code>offer_amount</code> and <code>offer_currency</code> are redundant (but may be
+informative for the payer to know how the sender claims
+<code>invreq_amount</code> was derived).</p>
 <h1 id="invoices">Invoices</h1>
-<p>Invoices are a request for payment, and when the payment is made 
+<p>Invoices are a payment request, and when the payment is made, 
 it can be combined with the invoice to form a cryptographic receipt.</p>
-<p>The human-readable prefix for invoices is <code>lni</code>.  It can be sent in
-response to an <code>invoice_request</code> or an <code>offer</code> with <code>send_invoice</code>
-using <code>onion_message</code> <code>invoice</code> field.</p>
+<p>The recipient sends an <code>invoice</code> in response to an <code>invoice_request</code> using
+the <code>onion_message</code> <code>invoice</code> field.</p>
 <ol>
 <li><code>tlv_stream</code>: <code>invoice</code></li>
 <li><p>types:</p>
 <ol>
-<li>type: 3 (<code>chain</code>)</li>
-<li>data:<ul>
-<li>[<code>chain_hash</code>:<code>chain</code>]</li>
-</ul>
-</li>
-<li>type: 4 (<code>offer_id</code>)</li>
-<li>data:<ul>
-<li>[<code>sha256</code>:<code>offer_id</code>]</li>
-</ul>
-</li>
-<li>type: 8 (<code>amount</code>)</li>
-<li>data:<ul>
-<li>[<code>tu64</code>:<code>msat</code>]</li>
-</ul>
-</li>
-<li>type: 10 (<code>description</code>)</li>
-<li>data:<ul>
-<li>[<code>...*utf8</code>:<code>description</code>]</li>
-</ul>
-</li>
-<li>type: 12 (<code>features</code>)</li>
-<li>data:<ul>
-<li>[<code>...*byte</code>:<code>features</code>]</li>
-</ul>
-</li>
-<li>type: 16 (<code>paths</code>)</li>
-<li>data:<ul>
-<li>[<code>...*blinded_path</code>:<code>paths</code>]</li>
-</ul>
-</li>
-<li>type: 18 (<code>blindedpay</code>)</li>
-<li>data:<ul>
-<li>[<code>...*blinded_payinfo</code>:<code>payinfo</code>]</li>
-</ul>
-</li>
-<li>type: 19 (<code>blinded_capacities</code>)</li>
-<li>data:<ul>
-<li>[<code>...*u64</code>:<code>incoming_msat</code>]</li>
-</ul>
-</li>
-<li>type: 20 (<code>issuer</code>)</li>
-<li>data:<ul>
-<li>[<code>...*utf8</code>:<code>issuer</code>]</li>
-</ul>
-</li>
-<li>type: 30 (<code>node_id</code>)</li>
-<li>data:<ul>
-<li>[<code>point32</code>:<code>node_id</code>]</li>
-</ul>
-</li>
-<li>type: 32 (<code>quantity</code>)</li>
-<li>data:<ul>
-<li>[<code>tu64</code>:<code>quantity</code>]</li>
-</ul>
-</li>
-<li>type: 34 (<code>refund_for</code>)</li>
-<li>data:<ul>
-<li>[<code>sha256</code>:<code>refunded_payment_hash</code>]</li>
-</ul>
-</li>
-<li>type: 38 (<code>payer_key</code>)</li>
-<li>data:<ul>
-<li>[<code>point32</code>:<code>key</code>]</li>
-</ul>
-</li>
-<li>type: 39 (<code>payer_note</code>)</li>
-<li>data:<ul>
-<li>[<code>...*utf8</code>:<code>note</code>]</li>
-</ul>
-</li>
-<li>type: 50 (<code>payer_info</code>)</li>
+<li>type: 0 (<code>invreq_metadata</code>)</li>
 <li>data:<ul>
 <li>[<code>...*byte</code>:<code>blob</code>]</li>
 </ul>
 </li>
-<li>type: 40 (<code>created_at</code>)</li>
+<li>type: 2 (<code>offer_chains</code>)</li>
+<li>data:<ul>
+<li>[<code>...*chain_hash</code>:<code>chains</code>]</li>
+</ul>
+</li>
+<li>type: 4 (<code>offer_metadata</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>data</code>]</li>
+</ul>
+</li>
+<li>type: 6 (<code>offer_currency</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>iso4217</code>]</li>
+</ul>
+</li>
+<li>type: 8 (<code>offer_amount</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>amount</code>]</li>
+</ul>
+</li>
+<li>type: 10 (<code>offer_description</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>description</code>]</li>
+</ul>
+</li>
+<li>type: 12 (<code>offer_features</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>features</code>]</li>
+</ul>
+</li>
+<li>type: 14 (<code>offer_absolute_expiry</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>seconds_from_epoch</code>]</li>
+</ul>
+</li>
+<li>type: 16 (<code>offer_paths</code>)</li>
+<li>data:<ul>
+<li>[<code>...*blinded_path</code>:<code>paths</code>]</li>
+</ul>
+</li>
+<li>type: 18 (<code>offer_issuer</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>issuer</code>]</li>
+</ul>
+</li>
+<li>type: 20 (<code>offer_quantity_max</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>max</code>]</li>
+</ul>
+</li>
+<li>type: 22 (<code>offer_node_id</code>)</li>
+<li>data:<ul>
+<li>[<code>point</code>:<code>node_id</code>]</li>
+</ul>
+</li>
+<li>type: 80 (<code>invreq_chain</code>)</li>
+<li>data:<ul>
+<li>[<code>chain_hash</code>:<code>chain</code>]</li>
+</ul>
+</li>
+<li>type: 82 (<code>invreq_amount</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>msat</code>]</li>
+</ul>
+</li>
+<li>type: 84 (<code>invreq_features</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>features</code>]</li>
+</ul>
+</li>
+<li>type: 86 (<code>invreq_quantity</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>quantity</code>]</li>
+</ul>
+</li>
+<li>type: 88 (<code>invreq_payer_id</code>)</li>
+<li>data:<ul>
+<li>[<code>point</code>:<code>key</code>]</li>
+</ul>
+</li>
+<li>type: 89 (<code>invreq_payer_note</code>)</li>
+<li>data:<ul>
+<li>[<code>...*utf8</code>:<code>note</code>]</li>
+</ul>
+</li>
+<li>type: 160 (<code>invoice_paths</code>)</li>
+<li>data:<ul>
+<li>[<code>...*blinded_path</code>:<code>paths</code>]</li>
+</ul>
+</li>
+<li>type: 162 (<code>invoice_blindedpay</code>)</li>
+<li>data:<ul>
+<li>[<code>...*blinded_payinfo</code>:<code>payinfo</code>]</li>
+</ul>
+</li>
+<li>type: 164 (<code>invoice_created_at</code>)</li>
 <li>data:<ul>
 <li>[<code>tu64</code>:<code>timestamp</code>]</li>
 </ul>
 </li>
-<li>type: 42 (<code>payment_hash</code>)</li>
-<li>data:<ul>
-<li>[<code>sha256</code>:<code>payment_hash</code>]</li>
-</ul>
-</li>
-<li>type: 44 (<code>relative_expiry</code>)</li>
+<li>type: 166 (<code>invoice_relative_expiry</code>)</li>
 <li>data:<ul>
 <li>[<code>tu32</code>:<code>seconds_from_creation</code>]</li>
 </ul>
 </li>
-<li>type: 46 (<code>cltv</code>)</li>
-<li>data:<ul>
-<li>[<code>tu32</code>:<code>min_final_cltv_expiry</code>]</li>
-</ul>
-</li>
-<li>type: 48 (<code>fallbacks</code>)</li>
-<li>data:<ul>
-<li>[<code>byte</code>:<code>num</code>]</li>
-<li>[<code>num*fallback_address</code>:<code>fallbacks</code>]</li>
-</ul>
-</li>
-<li>type: 52 (<code>refund_signature</code>)</li>
-<li>data:<ul>
-<li>[<code>bip340sig</code>:<code>payer_signature</code>]</li>
-</ul>
-</li>
-<li>type: 56 (<code>replace_invoice</code>)</li>
+<li>type: 168 (<code>invoice_payment_hash</code>)</li>
 <li>data:<ul>
 <li>[<code>sha256</code>:<code>payment_hash</code>]</li>
+</ul>
+</li>
+<li>type: 170 (<code>invoice_amount</code>)</li>
+<li>data:<ul>
+<li>[<code>tu64</code>:<code>msat</code>]</li>
+</ul>
+</li>
+<li>type: 172 (<code>invoice_fallbacks</code>)</li>
+<li>data:<ul>
+<li>[<code>...*fallback_address</code>:<code>fallbacks</code>]</li>
+</ul>
+</li>
+<li>type: 174 (<code>invoice_features</code>)</li>
+<li>data:<ul>
+<li>[<code>...*byte</code>:<code>features</code>]</li>
+</ul>
+</li>
+<li>type: 176 (<code>invoice_node_id</code>)</li>
+<li>data:<ul>
+<li>[<code>point</code>:<code>node_id</code>]</li>
 </ul>
 </li>
 <li>type: 240 (<code>signature</code>)</li>
@@ -688,6 +809,8 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 <li>[<code>u32</code>:<code>fee_base_msat</code>]</li>
 <li>[<code>u32</code>:<code>fee_proportional_millionths</code>]</li>
 <li>[<code>u16</code>:<code>cltv_expiry_delta</code>]</li>
+<li>[<code>u64</code>:<code>htlc_minimum_msat</code>]</li>
+<li>[<code>u64</code>:<code>htlc_maximum_msat</code>]</li>
 <li>[<code>u16</code>:<code>flen</code>]</li>
 <li>[<code>flen*byte</code>:<code>features</code>]</li>
 </ul>
@@ -701,77 +824,102 @@ using <code>onion_message</code> <code>invoice</code> field.</p>
 </ul>
 </li>
 </ol>
+<h2 id="invoice-features">Invoice Features</h2>
+<table>
+<thead>
+<tr>
+<th>Bits</th>
+<th>Description</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>16</td>
+<td>Multi-part-payment support</td>
+<td>MPP/compulsory</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Multi-part-payment support</td>
+<td>MPP/optional</td>
+</tr>
+</tbody>
+</table>
+<p>The &#39;MPP support&#39; invoice feature indicates that the payer MUST (16) or
+MAY (17) use multiple part payments to pay the invoice.</p>
+<p>Some implementations may not support MPP (e.g. for small payments), or
+may (due to capacity limits on a single channel) require it.</p>
 <h2 id="requirements">Requirements</h2>
 <p>A writer of an invoice:</p>
 <ul>
-<li>MUST set <code>created_at</code> to the number of seconds since Midnight 1
-January 1970, UTC when the offer was created.</li>
-<li>MUST set <code>payment_hash</code> to the SHA2 256-bit hash of the
-<code>payment_preimage</code> that will be given in return for payment.</li>
-<li>MUST set (or not set) <code>send_invoice</code> the same as the offer.</li>
-<li>MUST set <code>offer_id</code> to the id of the offer.</li>
-<li>MUST specify exactly one signature TLV: <code>signature</code>.<ul>
-<li>MUST set <code>sig</code> to the signature using <code>node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
-</ul>
-</li>
-<li>if the chain for the invoice is not bitcoin:<ul>
-<li>MUST specify <code>chain</code> the invoice is valid for.</li>
+<li>MUST set <code>invoice_created_at</code> to the number of seconds since Midnight 1
+January 1970, UTC when the invoice was created.</li>
+<li>MUST set <code>invoice_amount</code> to the minimum amount it will accept, in units of 
+the minimal lightning-payable unit (e.g. milli-satoshis for bitcoin) for
+<code>invreq_chain</code>.</li>
+<li>if the invoice is in response to an <code>invoice_request</code>:<ul>
+<li>MUST copy all non-signature fields from the <code>invoice_request</code> (including unknown fields).</li>
+<li>if <code>invreq_amount</code> is present:<ul>
+<li>MUST set <code>invoice_amount</code> to <code>invreq_amount</code></li>
 </ul>
 </li>
 <li>otherwise:<ul>
-<li>the bitcoin chain is implied as the first and only entry.</li>
+<li>MUST set <code>invoice_amount</code> to the <em>expected amount</em>.</li>
 </ul>
 </li>
-<li>if it has bolt11 features:<ul>
-<li>MUST set <code>features</code> to the bitmap of features.</li>
 </ul>
 </li>
-<li>if the expiry for accepting payment is not 7200 seconds after <code>created_at</code>:<ul>
-<li>MUST set <code>relative_expiry</code> <code>seconds_from_creation</code> to the number of
-seconds after <code>created_at</code> that payment of this invoice should not be attempted.</li>
+<li>otherwise (invoice not requested, e.g. for user to scan directly):<ul>
+<li>MUST set <code>invreq_chain</code> as it would for an invoice_request.</li>
+<li>MUST set <code>offer_description</code> as it would for an offer.</li>
+<li>MUST NOT set <code>invreq_payer_id</code> or <code>offer_node_id</code>.</li>
 </ul>
 </li>
-<li>if the <code>min_final_cltv_expiry</code> for the last HTLC in the route is not 18:<ul>
-<li>MUST set <code>min_final_cltv_expiry</code>.</li>
+<li>MUST set <code>invoice_payment_hash</code> to the SHA256 hash of the
+<code>payment_preimage</code> that will be given in return for payment.</li>
+<li>if <code>offer_node_id</code> is present:<ul>
+<li>MUST set <code>invoice_node_id</code> to <code>offer_node_id</code>.</li>
+</ul>
+</li>
+<li>otherwise:<ul>
+<li>MUST set <code>invoice_node_id</code> to a valid public key.</li>
+</ul>
+</li>
+<li>MUST specify exactly one signature TLV element: <code>signature</code>.<ul>
+<li>MUST set <code>sig</code> to the signature using <code>invoice_node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
+</ul>
+</li>
+<li>if it requires multiple parts to pay the invoice:<ul>
+<li>MUST set <code>invoice_features</code>.<code>features</code> bit <code>MPP/compulsory</code></li>
+</ul>
+</li>
+<li>or if it allows multiple parts to pay the invoice:<ul>
+<li>MUST set <code>invoice_features</code>.<code>features</code> bit <code>MPP/optional</code></li>
+</ul>
+</li>
+<li>if the expiry for accepting payment is not 7200 seconds after <code>invoice_created_at</code>:<ul>
+<li>MUST set <code>invoice_relative_expiry</code>.<code>seconds_from_creation</code> to the number of
+seconds after <code>invoice_created_at</code> that payment of this invoice should not be attempted.</li>
 </ul>
 </li>
 <li>if it accepts onchain payments:<ul>
-<li>MAY specify <code>fallbacks</code></li>
-<li>MUST specify <code>fallbacks</code> in order of most-preferred to least-preferred
+<li>MAY specify <code>invoice_fallbacks</code></li>
+<li>MUST specify <code>invoice_fallbacks</code> in order of most-preferred to least-preferred
 if it has a preference.</li>
 <li>for the bitcoin chain, it MUST set each <code>fallback_address</code> with
 <code>version</code> as a valid witness version and <code>address</code> as a valid witness
 program</li>
 </ul>
 </li>
-<li>if it is connected only by private channels:<ul>
-<li>MUST include a <code>blinded_path</code> containing one or more paths to the node.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MAY include <code>blinded_path</code>.</li>
-</ul>
-</li>
-<li>if it includes <code>blinded_path</code>:<ul>
-<li>MUST specify <code>path</code> in order of most-preferred to least-preferred if
-it has a preference.</li>
-<li>MUST include <code>blindedpay</code> with exactly one <code>payinfo</code> for
-each <code>onionmsg_path</code> in <code>blinded_path</code>, in order.</li>
-<li>if it includes <code>blinded_capacities</code>:<ul>
-<li>MUST include exactly one <code>incoming_msat</code> (in millisatoshis) per <code>path</code>, reflecting the expected maximum amount that can be sent through the path.</li>
-</ul>
-</li>
+<li>MUST include <code>invoice_paths</code> containing one or more paths to the node.<ul>
+<li>MUST specify <code>invoice_paths</code> in order of most-preferred to least-preferred if it has a preference.</li>
+<li>MUST include <code>invoice_blindedpay</code> with exactly one <code>blinded_payinfo</code> for each <code>blinded_path</code> in <code>paths</code>, in order.</li>
+<li>MUST set <code>features</code> in each <code>blinded_payinfo</code> to match <code>encrypted_data_tlv</code>.<code>allowed_features</code> (or empty, if no <code>allowed_features</code>).</li>
 <li>SHOULD ignore any payment which does not use one of the paths.</li>
 </ul>
 </li>
-<li>otherwise:<ul>
-<li>MUST NOT include <code>blinded_payinfo</code>.</li>
-</ul>
-</li>
-<li>MUST specify <code>amount</code>.<code>msat</code> in multiples of the minimum lightning-payable unit
-(e.g. milli-satoshis for bitcoin) for <code>chain</code> (or for bitcoin, if there is no <code>chain</code>).</li>
-<li>if responding to an <code>invoice_request</code>:<ul>
-<li>if for the same <code>offer_id</code> and <code>payer_key</code> as a previous <code>invoice_request</code>:<ul>
+<li>if <code>offer_node_id</code> is present, and <code>invreq_payer_id</code> is identical to a previous <code>invoice_request</code>:<ul>
 <li>MAY simply reuse the previous invoice.</li>
 </ul>
 </li>
@@ -779,159 +927,107 @@ each <code>onionmsg_path</code> in <code>blinded_path</code>, in order.</li>
 <li>MUST NOT reuse a previous invoice.</li>
 </ul>
 </li>
-<li>MUST set <code>node_id</code> the same as the offer.</li>
-<li>MUST set (or not set) <code>quantity</code> exactly as the invoice_request did.</li>
-<li>MUST set <code>payer_key</code> exactly as the invoice_request did.</li>
-<li>MUST set (or not set) <code>payer_info</code> exactly as the invoice_request did.</li>
-<li>MUST set (or not set) <code>payer_note</code> exactly as the invoice_request did,
-or MUST not set it.</li>
-<li>MUST set (or not set) <code>replace_invoice</code> exactly as the invoice_request did.</li>
-<li>MUST begin <code>description</code> with the <code>description</code> from the offer.</li>
-<li>MAY append additional information to <code>description</code> (e.g. &quot; +shipping&quot;).</li>
-<li>if it does not set <code>amount</code> to the <em>base invoice amount</em> calculated from the invoice_request:<ul>
-<li>MUST append the reason to <code>description</code> (e.g. &quot; 5% bulk discount&quot;).</li>
-</ul>
-</li>
-<li>MUST set (or not set) <code>issuer</code> exactly as the offer did.</li>
-<li>MUST NOT set <code>refund_for</code></li>
-<li>MUST NOT set <code>refund_signature</code></li>
-</ul>
-</li>
-<li>otherwise (responding to a <code>send_invoice</code> offer):<ul>
-<li>MUST set <code>node_id</code> to the id of the node to send payment to.</li>
-<li>MUST set <code>description</code> the same as the offer.</li>
-<li>if the offer had a <code>quantity_min</code> or <code>quantity_max</code> field:<ul>
-<li>MUST set <code>quantity</code></li>
-<li>MUST set it within that (inclusive) range.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT set <code>quantity</code></li>
-</ul>
-</li>
-<li>MUST set <code>payer_key</code> to the <code>node_id</code> of the offer.</li>
-<li>MUST NOT set <code>payer_info</code>.</li>
-<li>MUST set (or not set) <code>refund_for</code> exactly as the offer did.</li>
-<li>if it sets <code>refund_for</code>:<ul>
-<li>MUST set <code>refund_signature</code> to the signature of the
-<code>refunded_payment_hash</code> using prefix <code>refund_signature</code> and the <code>payer_key</code> from the to-be-refunded invoice.</li>
-</ul>
-</li>
-<li>otherwise:<ul>
-<li>MUST NOT set <code>refund_signature</code></li>
-</ul>
-</li>
-</ul>
-</li>
 </ul>
 <p>A reader of an invoice:</p>
 <ul>
-<li>MUST reject the invoice if <code>signature</code> is not a valid signature using <code>node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
-<li>MUST reject the invoice if <code>msat</code> is not present.</li>
-<li>MUST reject the invoice if <code>description</code> is not present.</li>
-<li>MUST reject the invoice if <code>created_at</code> is not present.</li>
-<li>MUST reject the invoice if <code>payment_hash</code> is not present.</li>
-<li>if <code>relative_expiry</code> is present:<ul>
-<li>MUST reject the invoice if the current time since 1970-01-01 UTC is greater than <code>created_at</code> plus <code>seconds_from_creation</code>.</li>
+<li>MUST reject the invoice if <code>invoice_amount</code> is not present.</li>
+<li>MUST reject the invoice if <code>invoice_created_at</code> is not present.</li>
+<li>MUST reject the invoice if <code>invoice_payment_hash</code> is not present.</li>
+<li>MUST reject the invoice if <code>invoice_node_id</code> is not present.</li>
+<li>if <code>invoice_features</code> contains unknown <em>odd</em> bits that are non-zero:<ul>
+<li>MUST ignore the bit.</li>
+</ul>
+</li>
+<li>if <code>invoice_features</code> contains unknown <em>even</em> bits that are non-zero:<ul>
+<li>MUST reject the invoice.</li>
+</ul>
+</li>
+<li>if <code>invoice_relative_expiry</code> is present:<ul>
+<li>MUST reject the invoice if the current time since 1970-01-01 UTC is greater than <code>invoice_created_at</code> plus <code>seconds_from_creation</code>.</li>
 </ul>
 </li>
 <li>otherwise:<ul>
-<li>MUST reject the invoice if the current time since 1970-01-01 UTC is greater than <code>created_at</code> plus 7200.</li>
+<li>MUST reject the invoice if the current time since 1970-01-01 UTC is greater than <code>invoice_created_at</code> plus 7200.</li>
 </ul>
 </li>
-<li>if <code>blinded_path</code> is present:<ul>
-<li>MUST reject the invoice if <code>blinded_payinfo</code> is not present.</li>
-<li>MUST reject the invoice if <code>blinded_payinfo</code> does not contain exactly as many <code>payinfo</code> as total <code>onionmsg_path</code> in <code>blinded_path</code>.</li>
+<li>MUST reject the invoice if <code>invoice_paths</code> is not present or is empty.</li>
+<li>MUST reject the invoice if <code>invoice_blindedpay</code> is not present.</li>
+<li>MUST reject the invoice if <code>invoice_blindedpay</code> does not contain exactly one <code>blinded_payinfo</code> per <code>invoice_paths</code>.<code>blinded_path</code>.</li>
+<li>For each <code>invoice_blindedpay</code>.<code>payinfo</code>:<ul>
+<li>MUST NOT use the corresponding <code>invoice_paths</code>.<code>path</code> if <code>payinfo</code>.<code>features</code> has any unknown even bits set.</li>
+<li>MUST reject the invoice if this leaves no usable paths.</li>
 </ul>
 </li>
-<li>SHOULD confirm authorization if <code>msat</code> is not within the amount range authorized.</li>
-<li>if the invoice is a reply to an <code>invoice_request</code>:<ul>
-<li>MUST reject the invoice unless <code>offer_id</code> is equal to the id of the offer.</li>
-<li>MUST reject the invoice unless <code>node_id</code> is equal to the offer.</li>
-<li>MUST reject the invoice unless the following fields are equal or unset
-exactly as they are in the <code>invoice_request:</code><ul>
-<li><code>quantity</code></li>
-<li><code>payer_key</code></li>
-<li><code>payer_info</code></li>
-<li>MUST reject the invoice if <code>payer_note</code> is set, and was unset or not equal to the field in the <code>invoice_request</code>.</li>
-<li>SHOULD confirm authorization if the <code>description</code> does not exactly
-match the <code>offer</code></li>
-<li>MAY highlight if <code>description</code> has simply had a change appended.</li>
-<li>SHOULD confirm authorization if <code>issuer</code> does not exactly
-match the <code>offer</code>.</li>
+<li>if the invoice is a response to an <code>invoice_request</code>:<ul>
+<li>MUST reject the invoice if all fields less than type 160 do not exactly match the <code>invoice_request</code>.</li>
+<li>if <code>offer_node_id</code> is present (invoice_request for an offer):<ul>
+<li>MUST reject the invoice if <code>invoice_node_id</code> is not equal to <code>offer_node_id</code>.</li>
+</ul>
+</li>
+<li>otherwise (invoice_request without an offer):<ul>
+<li>MAY reject the invoice if it cannot confirm that <code>invoice_node_id</code> is correct, out-of-band.</li>
 </ul>
 </li>
 </ul>
 </li>
-<li>otherwise if <code>offer_id</code> is set:<ul>
-<li>MUST reject the invoice if the <code>offer_id</code> does not refer an unexpired offer with <code>send_invoice</code></li>
-<li>MUST reject the invoice unless the following fields are equal or unset
-exactly as they are in the <code>offer</code>:<ul>
-<li><code>refund_for</code></li>
-<li><code>description</code></li>
+<li>otherwise: (a invoice presented without being requested, eg. scanned by user):<ul>
+<li>MAY choose to accept or reject the invoice.</li>
 </ul>
 </li>
-<li>if the offer had a <code>quantity_min</code> or <code>quantity_max</code> field:<ul>
-<li>MUST reject the invoice if there is no <code>quantity</code> field.</li>
-<li>MUST reject the invoice if there is <code>quantity</code> is not within that (inclusive) range.</li>
+<li>MUST reject the invoice if <code>signature</code> is not a valid signature using <code>invoice_node_id</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
+<li>SHOULD prefer to use earlier <code>invoice_paths</code> over later ones if it has no other reason for preference.</li>
+<li>if <code>invoice_features</code> contains the MPP/compulsory bit:<ul>
+<li>MUST pay the invoice via multiple separate blinded paths.</li>
+</ul>
+</li>
+<li>otherwise, if <code>invoice_features</code> contains the MPP/optional bit:<ul>
+<li>MAY pay the invoice via multiple separate payments.</li>
 </ul>
 </li>
 <li>otherwise:<ul>
-<li>MUST reject the invoice if there is a <code>quantity</code> field.</li>
+<li>MUST NOT use multiple parts to pay the invoice.</li>
 </ul>
 </li>
-</ul>
-</li>
-<li>if the offer contained <code>refund_for</code>:<ul>
-<li>MUST reject the invoice if <code>payer_key</code> does not match the invoice whose <code>payment_hash</code> is equal to <code>refund_for</code> <code>refunded_payment_hash</code></li>
-<li>MUST reject the invoice if <code>refund_signature</code> is not set.</li>
-<li>MUST reject the invoice if <code>refund_signature</code> is not a valid signature using <code>payer_key</code> as described in <a href="#signature-calculation">Signature Calculation</a>.</li>
-</ul>
-</li>
-<li>for the bitcoin chain, if the invoice specifies <code>fallbacks</code>:<ul>
+<li>SHOULD confirm authorization if <code>invoice_amount</code>.<code>msat</code> is not within the amount range authorized.</li>
+<li>for the bitcoin chain, if the invoice specifies <code>invoice_fallbacks</code>:<ul>
 <li>MUST ignore any <code>fallback_address</code> for which <code>version</code> is greater than 16.</li>
 <li>MUST ignore any <code>fallback_address</code> for which <code>address</code> is less than 2 or greater than 40 bytes.</li>
 <li>MUST ignore any <code>fallback_address</code> for which <code>address</code> does not meet known requirements for the given <code>version</code></li>
-</ul>
-</li>
-<li>if the <code>min_final_cltv_expiry</code> is specified:<ul>
-<li>MUST use an expiry delta of at least that value when making the payment</li>
-</ul>
-</li>
-<li>otherwise: <ul>
-<li>MUST use an expiry delta of at least 18 when making the payment</li>
 </ul>
 </li>
 </ul>
 <h2 id="rationale">Rationale</h2>
 <p>Because the messaging layer is unreliable, it&#39;s quite possible to
 receive multiple requests for the same offer.  As it&#39;s the caller&#39;s
-responsibility not to reuse <code>payer_key</code> except for recurring invoices,
+responsibility not to reuse <code>invreq_payer_id</code>
 the writer doesn&#39;t have to check all the fields are duplicates before
 simply returning a previous invoice.  Note that such caching is optional,
 and should be carefully limited when e.g. currency conversion is involved,
 or if the invoice has expired.</p>
-<p>The invoice duplicates fields rather than committing to the previous offer or
-invoice_request.  This flattened format simplifies storage at some space cost, as
+<p>The invoice duplicates fields rather than committing to the previous
+invreq.  This flattened format simplifies storage at some space cost, as
 the payer need only remember the invoice for any refunds or proof.</p>
-<p>The reader of the invoice cannot trust the invoice correctly reflects the
-offer and invoice_request fields, hence the requirements to check that they
-are correct.</p>
+<p>The reader of the invoice cannot trust the invoice correctly reflects
+the invreq fields, hence the requirements to check that they
+are correct, although allowance is made for simply sending an unrequested
+invoice directly.</p>
 <p>Note that the recipient of the invoice can determine the expected
-amount from either the offer it received, or the invoice_request it
+amount from either the offer it received, or the invreq it
 sent, so often already has authorization for the expected amount.</p>
-<p>It&#39;s natural to set the <code>relative_expiry</code> of an invoice for a
-recurring offer to the end of the payment window for the period, but
-if that is a long time and the offer was in another currency, it&#39;s
-common to cap this at some maximum duration.  For example, omitting it
-implies the default of 7200 seconds, which is generally a sufficient
-time for payment.</p>
-<p>The invoice issuer is allowed to ignore <code>payer_note</code> (it has an odd
-number, so is optional), but if it does not, it must copy it exactly
-as the invoice_request specified.</p>
-<p>It&#39;s often useful to provide capacity hints, particularly where more
-than one blinded path is included, for payers to use multi-part
-payments.</p>
+<p>The default <code>invoice_relative_expiry</code> of 7200 seconds, which is generally a
+sufficient time for payment, even if new channels need to be opened.</p>
+<p>Blinded paths provide an equivalent to <code>payment_secret</code> and <code>payment_metadata</code> used in BOLT 11.
+Even if <code>invoice_node_id</code> or <code>invreq_payer_id</code> is public, we force the use of blinding paths to keep these features.
+If the recipient does not care about the added privacy offered by blinded paths, they can create a path of length 1 with only themselves.</p>
+<p>Rather than provide detailed per-hop-payinfo for each hop in a blinded path, we aggregate the fees and CLTV deltas.
+This avoids trivially revealing any distinguishing non-uniformity which may distinguish the path.</p>
+<p>In the case of an invoice where there was no offer (just an invoice
+request), the payer needs to ensure that the invoice is from the
+intended payment recipient.  This is the basis for the suggestion to
+confirm the invoice_node_id for this case.</p>
+<p>Raw invoices (not based on an invoice_request) are generally not
+supported, though an implementation is allowed to support them, and we
+may define the behavior in future.</p>
 <h1 id="invoice-errors">Invoice Errors</h1>
 <p>Informative errors can be returned in an onion message <code>invoice_error</code>
 field (via the onion <code>reply_path</code>) for either <code>invoice_request</code> or
@@ -980,23 +1076,32 @@ field (via the onion <code>reply_path</code>) for either <code>invoice_request</
 <p>A reader of an invoice_error:
    FIXME!</p>
 <h2 id="rationale">Rationale</h2>
-<p>Usually an error message is sufficient for diagnostics, however there
-is at least one case where it should be programatically parsable.  A
-recurring offer which sets <code>send_invoice</code> can also specify a currency,
-which opens the possibility for a disagreement on exchange rate.  In
-this case, the <code>suggested_value</code> reflects its expected value, and the
-sender can send a new invoice.</p>
+<p>Usually an error message is sufficient for diagnostics, however future
+enhancements may make automated handling useful.</p>
+<p>In particular, we could allow non-offer-response <code>invoice_request</code>s to
+omit <code>invreq_amount</code> in future and use offer fields to
+indicate alternate currencies.  (&quot;I will send you 10c!&quot;).  Then the
+sender of the invoice would have to guess how many msat that was,
+and could use the <code>invoice_error</code> to indicate if the recipient disagreed
+with the conversion so the sender can send a new invoice.</p>
 <h1 id="fixme-possible-future-extensions-">FIXME: Possible future extensions:</h1>
 <ol>
 <li>The offer can require delivery info in the <code>invoice_request</code>.</li>
 <li>An offer can be updated: the response to an <code>invoice_request</code> is another offer,
-perhaps with a signature from the original <code>node_id</code></li>
+perhaps with a signature from the original <code>offer_node_id</code></li>
 <li>Any empty TLV fields can mean the value is supposed to be known by
 other means (i.e. transport-specific), but is still hashed for sig.</li>
-<li>We could upgrade to allow multiple offers in one invoice_request and
+<li>We could upgrade to allow multiple offers in one invreq and
 invoice, to make a shopping list.</li>
 <li>All-zero offer_id == gratuitous payment.</li>
 <li>Streaming invoices?</li>
+<li>Re-add recurrence.</li>
+<li>Re-add <code>invreq_refund_for</code> to support proofs.</li>
+<li>Re-add <code>invoice_replace</code> for requesting replacement of a (stuck-payment) 
+invoice with a new one.</li>
+<li>Allow non-offer <code>invoice_request</code> with alternate currencies?</li>
+<li>Add <code>offer_quantity_unit</code> to indicate stepping for quantity
+(e.g. 100 grams).</li>
 </ol>
 <p>[1] <a href="https://www.youtube.com/watch?v=4SYc_flMnMQ">https://www.youtube.com/watch?v=4SYc_flMnMQ</a></p>
 </body></html>
