@@ -16,7 +16,7 @@
 	Offers is
 	a <a href="https://github.com/lightningnetwork/lightning-rfc/pull/798">draft
 	  specification</a> (called a "BOLT") for Lightning wallets and nodes, with
-	experimental support already in <a href="https://github.com/ElementsProject/lightning/">c-lightning</a>.
+	experimental support already in <a href="https://github.com/ElementsProject/lightning/">Core lightning</a>.
       </p>
       <p>
 	We host an HTML copy <a href="bolt12.html">of the latest text</a>.
@@ -26,7 +26,7 @@
 
       <div class="row">
 	<div class="col-sm-2" style="text-align: center">
-	  <img src="lno1pg257enxv4ezqcneype82um50ynhxgrwdajx283qfwdpl28qqmc78ymlvhmxcsywdk5wrjnj36jryg488qwlrnzyjczs.png" class="img-fluid">
+	  <img src="lno1pg257enxv4ezqcneype82um50ynhxgrwdajx293pqglnyxw6q0hzngfdusg8umzuxe8kquuz7pjl90ldj8wadwgs0xlmc.png" class="img-fluid">
 	  BOLT12 Offer
 	</div>
 	<div class="col">
@@ -35,7 +35,7 @@
 	</p>
 
 	<p>
-	  But it could also offer to send <b>you</b> money, like for an ATM.
+	  But it could send <b>you</b> money, like for an ATM.
 	</p>
 
 	<p>
@@ -51,7 +51,7 @@
       <h2>How It Works</h2>
 
       <p>
-	An "offer" has enough information for you to reach out and fetch a real invoice from the vendor, <em>through the Lightning Network itself</em>, just like it would send a payment: no web server needed. Your wallet then pays the actual invoice (or, for a "send invoice" offer, your wallet sends an invoice which the vendor pays, as an ATM or refund would use).
+	An "offer" has enough information for you to reach out and fetch a real invoice from the issuer, <em>through the Lightning Network itself</em>, just like it would send a payment: no web server needed. Your wallet then pays the actual invoice (or, if you scan an "invoice_request", your wallet sends an invoice which the vendor pays, as an ATM or refund would use).
       </p>
 
       <p>
@@ -61,7 +61,7 @@
       <h2>Who</h2>
 
       <p>
-	I am <a href="https://rusty.ozlabs.org">Rusty Russell</a>, lead developer of c-lightning for <a href="https://blockstream.com">Blockstream</a>, which was the first implementation of the lightning network, and was the original chair of the <a href="https://github.com/lightningnetwork/lightning-rfc">Lightning Specification</a> process.  I also wrote the BOLT11 specification which defines lightning invoices used today, and so am very familiar with its limitations as the Lightning Network becomes ever more sophisticated.
+	I am <a href="https://rusty.ozlabs.org">Rusty Russell</a>, lead developer of Core lightning for <a href="https://blockstream.com">Blockstream</a>, which was the first implementation of the lightning network, and was the original chair of the <a href="https://github.com/lightningnetwork/lightning-rfc">Lightning Specification</a> process.  I also wrote the BOLT11 specification which defines lightning invoices used today, and so am very familiar with its limitations as the Lightning Network becomes ever more sophisticated.
       </p>
 
       <h2>Deployment</h2>
@@ -102,7 +102,7 @@
 		<div class="card-body">
 			<h3 class="card-title">Blinded Paths</h3>
 			<p>
-			  This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the vendor, if they want to.
+			  This is supported in both onion messages and payments. It means the sender doesn't know where the message is going, but includes encrypted blobs given in the onion message. This is used for onion message replies, for example. It also allows offers to avoid revealing the node id of the issuer, if they want to.
 			</p>
 		</div>
 	  </div>
@@ -118,17 +118,9 @@
 	<div class="row">
 	  <div class="col-sm card m-3">
 		<div class="card-body">
-			<h3 class="card-title">BIP 340</h3>
-			<p>
-			  BOLT 12 uses x-only public keys (trivially backwards compatible for current nodes which use SEC-1 encoded compressed keys) which are slightly shorter, and uses the same signature scheme as Taproot.
-			</p>
-		</div>
-	  </div>
-	  <div class="col-sm card m-3">
-		<div class="card-body">
 			<h3 class="card-title">Payer proofs</h3>
 			<p>
-			  Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the vendor can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
+			  Your wallet creates a "payer key" when it requests an invoice: it can use this to prove to it owns the invoice (even the issuer can't fake this). This is used to claim refunds, for example (and with Blinded Paths you don't need to reveal your node identity to get your money back!).
 			</p>
 		</div>
 	  </div>
@@ -136,7 +128,7 @@
 		<div class="card-body">
 			<h3 class="card-title">Merkle Trees</h3>
 			<p>
-			  Offers are technically a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
+			  Invoice requests, and invoices themselves are signed as a Merkle tree, which allows you to prove you made a payment, *without* revealing the details you don't want to.
 			</p>
 		</div>
 	  </div>
